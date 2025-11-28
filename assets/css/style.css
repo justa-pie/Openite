@@ -151,6 +151,13 @@ h1 {
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.1);
 }
 
+.contact {
+    color: gray;
+    font-size: medium;
+    left: 5px;
+    bottom: 5px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .profile-container {
