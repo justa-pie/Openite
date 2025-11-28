@@ -59,11 +59,11 @@
     <script>
         // Generate random stars
         const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 200; i++) {
+        for (let i = 0; i < 50; i++) {
             const star = document.createElement('div');
             star.className = 'star';
-            star.style.left = Math.random() * 200 + '%';
-            star.style.top = Math.random() * 200 + '%';
+            star.style.left = Math.random() * 50 + '%';
+            star.style.top = Math.random() * 50 + '%';
             star.style.animationDelay = Math.random() * 3 + 's';
             starsContainer.appendChild(star);
         }
