@@ -18,6 +18,8 @@
         <h1>Justa Pie</h1>
         <p class="subtitle">I just sort of always feel sick without you baby</p>
         <p class="subtitle">Nothing seems to stick without you, baby</p>
+        <p class="subtitle">It's just the pits without you, baby</p>
+        <p class="subtitle">It's really just the pits without you, baby</p>
         <p class="subtitle">It's like everyone's a dick without you, baby</p>
         <div class="location">
             <span>📍</span>
@@ -77,29 +79,26 @@
             const mouseX = e.clientX;
             const mouseY = e.clientY;
 
-            allStars.forEach(star => {
-                // Lấy vị trí thực tế của ngôi sao trên màn hình
-                const starRect = star.getBoundingClientRect();
-                const starX = starRect.left + starRect.width / 2;
-                const starY = starRect.top + starRect.height / 2;
+            // Dùng requestAnimationFrame để tối ưu hiệu suất, giúp hiệu ứng mượt hơn
+            requestAnimationFrame(() => {
+                allStars.forEach(star => {
+                    // Lấy vị trí thực tế của ngôi sao trên màn hình
+                    const starRect = star.getBoundingClientRect();
+                    const starX = starRect.left + starRect.width / 2;
+                    const starY = starRect.top + starRect.height / 2;
 
-                // Tính khoảng cách giữa chuột và ngôi sao
-                const distance = Math.sqrt(
-                    Math.pow(mouseX - starX, 2) + Math.pow(mouseY - starY, 2)
-                );
+                    // Tính khoảng cách giữa chuột và ngôi sao
+                    const distance = Math.sqrt(
+                        Math.pow(mouseX - starX, 2) + Math.pow(mouseY - starY, 2)
+                    );
 
-                // Nếu ngôi sao nằm trong bán kính tương tác, làm nó sáng lên
-                if (distance < interactionRadius) {
-                    star.classList.add('active');
-                    // Có thể điều chỉnh thêm độ sáng dựa trên khoảng cách
-                    // const brightness = 1 - (distance / interactionRadius); // 1 khi sát, 0 khi ở rìa
-                    // star.style.opacity = 0.5 + 0.5 * brightness; 
-                    // star.style.boxShadow = `0 0 ${5 * brightness}px ${2 * brightness}px rgba(255, 255, 255, ${0.8 * brightness})`;
-                } else {
-                    star.classList.remove('active');
-                    // star.style.opacity = ''; // Đặt lại về CSS mặc định
-                    // star.style.boxShadow = ''; // Đặt lại về CSS mặc định
-                }
+                    // Nếu ngôi sao nằm trong bán kính tương tác, làm nó sáng rực lên
+                    if (distance < interactionRadius) {
+                        star.classList.add('active');
+                    } else {
+                        star.classList.remove('active');
+                    }
+                });
             });
         });
 
@@ -109,10 +108,9 @@
             backgroundAudio.play()
                 .then(() => {
                     document.removeEventListener('click', attemptPlay);
-                    console.log("Audio started playing successfully.");
                 })
                 .catch(error => {
-                    console.warn("Audio playback was prevented. Waiting for next interaction.", error);
+                    // console.warn("Audio playback was prevented. Waiting for next interaction.", error);
                 });
         });
         
