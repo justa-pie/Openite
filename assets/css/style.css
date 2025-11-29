@@ -17,27 +17,42 @@ body {
 }
 
 /* Animated background */
+.stars {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
 .star {
     position: absolute;
     width: 2px;
     height: 2px;
-    background: white;
+    background: #fff;
     border-radius: 50%;
-    opacity: 0.5; /* Độ mờ ban đầu */
-    animation: twinkle 3s infinite ease-in-out; /* Hiệu ứng nhấp nháy ban đầu */
-    transition: opacity 0.2s ease, box-shadow 0.2s ease; /* Chuyển động mượt mà khi thay đổi sáng */
-    /* pointer-events: none; (có thể thêm nếu muốn chuột xuyên qua sao) */
-}
-
-/* Class mới khi sao được kích hoạt bởi chuột */
-.star.active {
-    opacity: 1; /* Sáng hơn */
-    box-shadow: 0 0 5px 2px rgba(255, 255, 255, 0.8), /* Phát sáng trắng */
+    animation: twinkle 3s infinite ease-in-out;
+    transition: opacity 0.2s ease, box-shadow 0.2s ease; /* Thêm transition để chuyển đổi mượt mà */
 }
 
 @keyframes twinkle {
-    0%, 100% { opacity: 0.3; }
-    50% { opacity: 1; }
+    /* Điều chỉnh opacity tối thiểu lên 0.6 để sao luôn sáng */
+    0%, 100% { 
+        opacity: 0.6; 
+        box-shadow: 0 0 2px rgba(255, 255, 255, 0.5); /* Sáng mờ ban đầu */
+    }
+    50% { 
+        opacity: 1; 
+        box-shadow: 0 0 4px rgba(255, 255, 255, 0.8); /* Sáng rõ nhất khi nhấp nháy */
+    }
+}
+
+/* Class Active: Kích hoạt khi chuột đến gần */
+.star.active {
+    opacity: 1 !important; /* Đảm bảo độ sáng tối đa, tránh bị animation ghi đè */
+    box-shadow: 0 0 8px 4px rgba(255, 255, 255, 0.9), /* Sáng rực trắng */
+                0 0 20px 8px rgba(173, 216, 230, 0.7); /* Sáng rực xanh nhạt */
 }
 
 /* Main container */
