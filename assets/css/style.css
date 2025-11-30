@@ -61,10 +61,10 @@ body {
     border-radius: 24px;
     padding: 60px 80px;
     text-align: center;
-    max-width: 500px;
+    max-width: 500px; /* Giữ nguyên max-width cho thiết kế chính */
     width: 90%;
     position: relative;
-    z-index: 10; /* Giữ nguyên z-index này */
+    z-index: 10;
     transform: translateY(0);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -218,21 +218,134 @@ h1:hover {
     visibility: hidden;
 }
 
-/* Responsive */
+/* ---------------------------------- */
+/* Responsive Media Queries START */
+/* ---------------------------------- */
+
+/* Desktop/Laptop (max-width: 1440px) 
+    - Chủ yếu dùng để giới hạn kích thước vùng chứa nếu màn hình quá lớn
+    - Trong trường hợp này, `max-width: 500px` của `.profile-container` đã làm tốt việc này. 
+    - Chỉ điều chỉnh nếu muốn container lớn hơn trên desktop. Nếu không, có thể bỏ qua block này.
+*/
+@media (max-width: 1440px) {
+    /* Không cần thay đổi lớn vì max-width: 500px đã được đặt */
+    .profile-container {
+        padding: 50px 70px;
+    }
+    h1 {
+        font-size: 40px;
+    }
+}
+
+/* Tablet ngang (Landscape Tablet - max-width: 1024px) */
+@media (max-width: 1024px) {
+    .profile-container {
+        padding: 50px 60px;
+        /* Có thể tăng max-width một chút nếu muốn tận dụng không gian tablet */
+        max-width: 450px; 
+    }
+    .avatar {
+        width: 130px;
+        height: 130px;
+    }
+    h1 {
+        font-size: 38px;
+    }
+}
+
+/* Tablet dọc (Portrait Tablet - max-width: 834px) */
+@media (max-width: 834px) {
+    .profile-container {
+        padding: 40px 50px;
+        max-width: 400px;
+    }
+    .avatar {
+        width: 120px;
+        height: 120px;
+    }
+    h1 {
+        font-size: 36px;
+    }
+    .social-icon {
+        width: 45px;
+        height: 45px;
+        font-size: 22px;
+    }
+}
+
+/* Mobile ngang (Landscape Mobile - max-width: 768px) */
 @media (max-width: 768px) {
     .profile-container {
-        padding: 40px 30px;
+        padding: 40px 30px; /* Giảm padding */
         margin: 20px;
+        max-width: 90%; /* Cho phép container chiếm gần hết chiều rộng */
     }
 
-    .contact-bar {
-        top: 10px;
-        right: 10px;
-        font-size: 11px;
-        padding: 8px 15px;
+    .avatar {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+    }
+    
+    h1 {
+        font-size: 32px;
+        margin-bottom: 20px;
+    }
+    .subtitle {
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+    .social-icons {
+        gap: 10px;
+        margin: 20px 0 15px;
+    }
+    .social-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+    .contact {
+        font-size: small;
+    }
+    .cte {
+        font-size: x-large;
+    }
+}
+
+/* Mobile dọc (Portrait Mobile - max-width: 480px) */
+@media (max-width: 480px) {
+    body {
+        /* Đảm bảo nội dung không bị cắt */
+        overflow-y: auto; 
+    }
+
+    .profile-container {
+        padding: 30px 20px;
+        margin: 15px;
+        width: 95%; /* Chiếm gần hết chiều rộng màn hình */
+    }
+
+    .avatar {
+        width: 90px;
+        height: 90px;
     }
 
     h1 {
-        font-size: 32px;
+        font-size: 28px;
+        letter-spacing: 1px;
+    }
+
+    .subtitle {
+        font-size: 13px;
+    }
+    
+    .social-icons {
+        gap: 8px;
+    }
+
+    .social-icon {
+        width: 35px;
+        height: 35px;
+        font-size: 18px;
     }
 }
