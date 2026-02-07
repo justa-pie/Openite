@@ -1,0 +1,22 @@
+[
+    {
+        "name": "Sakura Blossom",
+        "description": "Beautiful cherry blossom decoration for Spring season",
+        "price_usd": 2.99,
+        "image_url": "https://cdn.discordapp.com/avatar-decoration-presets/a_1234567890abcdef/sakura.png",
+        "collection": "Spring 2025",
+        "type": "avatar_decoration",
+        "premium": false,
+        "available": true
+    },
+    {
+        "name": "Neon Dragon",
+        "description": "Cyberpunk style dragon with neon glow effect",
+        "price_usd": 4.99,
+        "image_url": "https://cdn.discordapp.com/avatar-decoration-presets/a_fedcba0987654321/dragon.png",
+        "collection": "Cyberpunk",
+        "type": "profile_effect",
+        "premium": true,
+        "available": true
+    }
+]
