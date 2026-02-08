@@ -877,7 +877,7 @@ body {
 }
 
 .product-price {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: 'Fira Code', serif;
     font-size: 1.8rem;
     font-weight: 700;
     color: var(--black);
@@ -890,7 +890,7 @@ body {
 }
 
 .price-original {
-    font-size: 0.9rem;
+    font-size: 1.3rem;
     color: #999;
     text-decoration: line-through;
     margin-left: 0.5rem;

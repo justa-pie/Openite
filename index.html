@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JPStore - Justa Pie Digital Store</title>
+    <title>JPStore - Justa Pie Store</title>
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="assets/css/style.css">
@@ -60,7 +61,7 @@
                     <span class="category-count">4</span>
                 </a>
                 <a href="#" class="category-item" onclick="filterProducts('decoration')">
-                    <span class="category-icon"><i class="fas fa-star"></i></span>
+                    <span class="category-icon"><i class="fa-solid fa-user"></i></i></span>
                     <span class="category-name">Decorations</span>
                     <span class="category-count">9</span>
                 </a>
@@ -79,12 +80,12 @@
                     <span class="category-count">2</span>
                 </a>
                 <a href="#" class="category-item" onclick="filterProducts('netflix')">
-                    <span class="category-icon"><i class="fas fa-film"></i></span>
+                    <span class="category-icon"><i class="fa-solid fa-video"></i></i></span>
                     <span class="category-name">Netflix</span>
                     <span class="category-count">1</span>
                 </a>
                 <a href="#" class="category-item" onclick="filterProducts('canva')">
-                    <span class="category-icon"><i class="fas fa-palette"></i></span>
+                    <span class="category-icon"><i class="fa-solid fa-object-group"></i></span>
                     <span class="category-name">Canva</span>
                     <span class="category-count">2</span>
                 </a>
@@ -102,12 +103,12 @@
             <div class="category-section">
                 <div class="category-title">Other Services</div>
                 <a href="#" class="category-item" onclick="filterProducts('build-server')">
-                    <span class="category-icon"><i class="fas fa-file-excel"></i></span>
+                    <span class="category-icon"><i class="fa-solid fa-screwdriver-wrench"></i></span>
                     <span class="category-name">Build Server</span>
                     <span class="category-count">1</span>
                 </a>
                 <a href="#" class="category-item" onclick="filterProducts('owo')">
-                    <span class="category-icon"><i class="fas fa-shield-alt"></i></span>
+                    <span class="category-icon"><i class="fa-solid fa-coins"></i></span>
                     <span class="category-name">OwO</span>
                     <span class="category-count">1</span>
                 </a>
@@ -136,9 +137,9 @@
                                 JPStore - Justa Pie
                                 <span class="verified-badge"><i class="fas fa-check-circle"></i></span>
                             </h2>
-                            <p class="profile-username">@jpstore.official</p>
+                            <p class="profile-username">@jpstore</p>
                             <p class="profile-description">
-                                🌟 Cửa hàng dịch vụ số cao cấp hàng đầu Việt Nam. Chuyên cung cấp Discord Nitro, 
+                                Cửa hàng dịch vụ và sản phẩm cao cấp hàng đầu Việt Nam. Chuyên cung cấp Discord Nitro, 
                                 Premium Accounts (Spotify, Netflix, YouTube, Canva), Robux và nhiều dịch vụ khác. 
                                 Giao hàng tức thì - Hỗ trợ 24/7 - Giá tốt nhất thị trường!
                             </p>
@@ -218,7 +219,7 @@
                 <div class="why-choose-section">
                     <h2 class="section-title">Tại Sao Chọn JPStore?</h2>
                     <p class="section-description">
-                        JPStore (Justa Pie) cung cấp các dịch vụ và công cụ cao cấp để nâng cao trải nghiệm số của bạn. 
+                        JPStore (Justa Pie) cung cấp các dịch vụ và sản phẩm cao cấp để nâng cao trải nghiệm của bạn. 
                         Từ các nâng cấp hiệu suất đến những cải tiến thẩm mỹ, chúng tôi luôn ở đây để giúp bạn 
                         vượt qua giới hạn và tạo nên sự khác biệt.
                     </p>
@@ -374,7 +375,7 @@
                             <p class="product-description">Nâng cấp trải nghiệm Discord với emoji tùy chỉnh, upload file lớn hơn</p>
                             <div class="product-footer">
                                 <div class="product-price">40K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -390,7 +391,7 @@
                             <p class="product-description">Toàn bộ tính năng Nitro cơ bản với giá hợp lý</p>
                             <div class="product-footer">
                                 <div class="product-price">90K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -406,7 +407,7 @@
                             <p class="product-description">Tiết kiệm hơn khi mua gói 3 tháng</p>
                             <div class="product-footer">
                                 <div class="product-price">240K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -422,7 +423,7 @@
                             <p class="product-description">Trải nghiệm đầy đủ nhất với server boost, HD streaming</p>
                             <div class="product-footer">
                                 <div class="product-price">150K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -438,7 +439,7 @@
                             <p class="product-description">Gói ưu đãi 3 tháng với đầy đủ tính năng</p>
                             <div class="product-footer">
                                 <div class="product-price">375K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -454,7 +455,7 @@
                             <p class="product-description">Tiết kiệm nhất với gói 1 năm Nitro Full</p>
                             <div class="product-footer">
                                 <div class="product-price">1399K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -468,11 +469,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Profile Effect - 1 Tháng</h3>
-                            <p class="product-description">Hiệu ứng profile độc đáo để nổi bật</p>
+                            <h3 class="product-name">Decor #1</h3>
+                            <p class="product-description">Discord: 66K | JPStore: 23K</p>
                             <div class="product-footer">
-                                <div class="product-price">45K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">66K</span> 23K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -484,11 +485,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Profile Effect - 3 Tháng</h3>
-                            <p class="product-description">Gói 3 tháng với giá ưu đãi</p>
+                            <h3 class="product-name">Decor #2</h3>
+                            <p class="product-description">Discord: 79K | JPStore: 36K</p>
                             <div class="product-footer">
-                                <div class="product-price">115K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">79K</span> 36K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -500,11 +501,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Avatar Decoration - 1 Tháng</h3>
-                            <p class="product-description">Trang trí avatar độc đáo</p>
+                            <h3 class="product-name">Decor #3</h3>
+                            <p class="product-description">Discord: 92K | JPStore: 54K</p>
                             <div class="product-footer">
-                                <div class="product-price">45K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">92K</span> 54K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -516,11 +517,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Avatar Decoration - 3 Tháng</h3>
-                            <p class="product-description">Gói tiết kiệm 3 tháng</p>
+                            <h3 class="product-name">Decor #4</h3>
+                            <p class="product-description">Discord: 105K | JPStore: 64K</p>
                             <div class="product-footer">
-                                <div class="product-price">115K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">105K</span> 64k</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -532,11 +533,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Profile Theme - 1 Tháng</h3>
-                            <p class="product-description">Theme cho profile cá nhân</p>
+                            <h3 class="product-name">Decor #5</h3>
+                            <p class="product-description">Discord: 111K | JPStore: 74K</p>
                             <div class="product-footer">
-                                <div class="product-price">45K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">111K</span> 74K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -548,11 +549,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Profile Theme - 3 Tháng</h3>
-                            <p class="product-description">Theme 3 tháng với giá tốt</p>
+                            <h3 class="product-name">Decor #6</h3>
+                            <p class="product-description">Discord: 131K | JPStore: 94K</p>
                             <div class="product-footer">
-                                <div class="product-price">115K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">131K</span> 94K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -564,11 +565,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Custom Profile Banner</h3>
-                            <p class="product-description">Banner profile tùy chỉnh theo yêu cầu</p>
+                            <h3 class="product-name">Decor #7</h3>
+                            <p class="product-description">Discord: 141K | JPStore: 99K</p>
                             <div class="product-footer">
-                                <div class="product-price">60K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">141K</span> 99K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -580,11 +581,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Custom Emoji Pack</h3>
-                            <p class="product-description">Gói emoji tùy chỉnh độc quyền</p>
+                            <h3 class="product-name">Decor #8</h3>
+                            <p class="product-description">Discord: 146K | JPStore: 109K</p>
                             <div class="product-footer">
-                                <div class="product-price">80K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">146K</span> 109K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -596,11 +597,11 @@
                         </div>
                         <div class="product-info">
                             <div class="product-category">Decorations</div>
-                            <h3 class="product-name">Full Decoration Package</h3>
-                            <p class="product-description">Gói combo tất cả decoration - tiết kiệm nhất</p>
+                            <h3 class="product-name">Decor #9</h3>
+                            <p class="product-description">Discord: 189K | JPStore: 139K</p>
                             <div class="product-footer">
-                                <div class="product-price">249K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <div class="product-price"><span class="price-original">189K</span> 139K</div>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -618,7 +619,7 @@
                             <p class="product-description">Boost server lên Level 1</p>
                             <div class="product-footer">
                                 <div class="product-price">45K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -634,7 +635,7 @@
                             <p class="product-description">Đạt Level 2 ngay lập tức</p>
                             <div class="product-footer">
                                 <div class="product-price">99K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -650,7 +651,7 @@
                             <p class="product-description">Duy trì Level 2 cho 2 tháng</p>
                             <div class="product-footer">
                                 <div class="product-price">169K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -666,7 +667,7 @@
                             <p class="product-description">Đạt Level 2 cho 3 tháng</p>
                             <div class="product-footer">
                                 <div class="product-price">249K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -684,7 +685,7 @@
                             <p class="product-description">Add vào YouTube Premium Family. Xem video không quảng cáo, phát nền</p>
                             <div class="product-footer">
                                 <div class="product-price">20K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -702,7 +703,7 @@
                             <p class="product-description">Add vào Spotify Premium Family. Nghe nhạc không quảng cáo, tải về offline</p>
                             <div class="product-footer">
                                 <div class="product-price">35K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -718,7 +719,7 @@
                             <p class="product-description">Add vào Spotify Family cho 2 tháng với giá ưu đãi</p>
                             <div class="product-footer">
                                 <div class="product-price">55K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -736,7 +737,7 @@
                             <p class="product-description">Cấp tài khoản Netflix Premium. Xem phim và series yêu thích chất lượng cao</p>
                             <div class="product-footer">
                                 <div class="product-price">65K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -754,7 +755,7 @@
                             <p class="product-description">Canva Education cho sinh viên - truy cập template và công cụ thiết kế chuyên nghiệp</p>
                             <div class="product-footer">
                                 <div class="product-price">36K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -770,7 +771,7 @@
                             <p class="product-description">Canva Pro đầy đủ tính năng - thiết kế chuyên nghiệp với AI và template cao cấp</p>
                             <div class="product-footer">
                                 <div class="product-price">65K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -788,7 +789,7 @@
                             <p class="product-description">Dịch vụ build server Discord chuyên nghiệp theo ý tưởng của bạn. Bao gồm setup channels, roles, bots và tất cả tính năng</p>
                             <div class="product-footer">
                                 <div class="product-price">70K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -806,7 +807,7 @@
                             <p class="product-description">1 triệu OwO Cash cho bot game OwO trên Discord. Mua pets, gems và items trong game</p>
                             <div class="product-footer">
                                 <div class="product-price">6.5K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -821,10 +822,10 @@
                         <div class="product-info">
                             <div class="product-category">Roblox</div>
                             <h3 class="product-name">250 Robux</h3>
-                            <p class="product-description">250 Robux cho tài khoản Roblox (Đã tính thuế 30%). Mua avatar, items và game passes</p>
+                            <p class="product-description">250 Robux (Đã tính thuế 30%)</p>
                             <div class="product-footer">
                                 <div class="product-price">59K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -837,10 +838,10 @@
                         <div class="product-info">
                             <div class="product-category">Roblox</div>
                             <h3 class="product-name">500 Robux</h3>
-                            <p class="product-description">500 Robux cho tài khoản Roblox (Đã tính thuế 30%)</p>
+                            <p class="product-description">500 Robux (Đã tính thuế 30%)</p>
                             <div class="product-footer">
                                 <div class="product-price">99K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -853,10 +854,10 @@
                         <div class="product-info">
                             <div class="product-category">Roblox</div>
                             <h3 class="product-name">750 Robux</h3>
-                            <p class="product-description">750 Robux cho tài khoản Roblox (Đã tính thuế 30%)</p>
+                            <p class="product-description">750 Robux (Đã tính thuế 30%)</p>
                             <div class="product-footer">
                                 <div class="product-price">149K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -869,10 +870,10 @@
                         <div class="product-info">
                             <div class="product-category">Roblox</div>
                             <h3 class="product-name">1000 Robux</h3>
-                            <p class="product-description">1000 Robux cho tài khoản Roblox (Đã tính thuế 30%)</p>
+                            <p class="product-description">1000 Robux (Đã tính thuế 30%)</p>
                             <div class="product-footer">
                                 <div class="product-price">199K</div>
-                                <button class="buy-now-btn" onclick="window.location.href='#DISCORD_LINK'">Mua Ngay</button>
+                                <button class="buy-now-btn" onclick="showPage('purchase')">Mua Ngay</button>
                             </div>
                         </div>
                     </div>
@@ -950,7 +951,7 @@
                 <div class="footer-content">
                     <div class="footer-section">
                         <h3>JPSTORE</h3>
-                        <p>Justa Pie - Premium digital services store. Uy tín - Chất lượng - Tận tâm.</p>
+                        <p>Justa Pie - Products - services store. Uy tín - Chất lượng - Tận tâm.</p>
                         <p style="margin-top: 1rem; color: var(--accent);"><i class="fas fa-star"></i> Nơi ước mơ số hóa trở thành hiện thực</p>
                     </div>
                     <div class="footer-section">
@@ -971,14 +972,12 @@
                     <div class="footer-section">
                         <h3>Về Chúng Tôi</h3>
                         <ul>
-                            <li><a href="#" onclick="showPage('home')">Giới thiệu</a></li>
-                            <li><a href="#" onclick="showPage('home')">Tại sao chọn chúng tôi</a></li>
-                            <li><a href="#" onclick="showPage('home')">Đánh giá khách hàng</a></li>
+                            <li><a href="#" onclick="showPage('home')">Mọi thứ bạn cần biết về JPStore</a></li>
                         </ul>
                     </div>
                 </div>
                 <div class="footer-bottom">
-                    <p>© 2025 JPStore - Justa Pie. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--accent);"></i> and <i class="fas fa-coffee" style="color: var(--accent);"></i></p>
+                    <p>© 2026 JPStore - Justa Pie. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--accent);"></i> and <i class="fas fa-coffee" style="color: var(--accent);"></i></p>
                 </div>
             </footer>
         </main>

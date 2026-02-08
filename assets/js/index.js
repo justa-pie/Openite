@@ -20,11 +20,16 @@ function showPage(pageName) {
     const categoryItems = document.querySelectorAll('.category-item');
     categoryItems.forEach(item => item.classList.remove('active'));
     
-    // Set active for home if showing home page
+    // Set active for the corresponding sidebar item
     if (pageName === 'home') {
         const homeItem = document.querySelector('.category-item[onclick*="showPage(\'home\')"]');
         if (homeItem) {
             homeItem.classList.add('active');
+        }
+    } else if (pageName === 'purchase') {
+        const purchaseItem = document.querySelector('.category-item[onclick*="showPage(\'purchase\')"]');
+        if (purchaseItem) {
+            purchaseItem.classList.add('active');
         }
     }
     
