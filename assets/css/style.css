@@ -344,7 +344,6 @@ body {
     background: rgba(245, 232, 220, 0.2);
     border-radius: 10px;
     outline: none;
-    -webkit-appearance: none;
     cursor: pointer;
 }
 
