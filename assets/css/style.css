@@ -1524,21 +1524,41 @@ body {
         right: 1rem;
         left: 1rem;
         z-index: 999;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        background: var(--black);
-        border-color: var(--primary);
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+        background: #1a1a1a !important;
+        border: 2px solid var(--primary) !important;
+        backdrop-filter: none;
+    }
+
+    .search-box input {
+        color: var(--cream) !important;
+        background: transparent !important;
+    }
+
+    .search-box i,
+    .volume-control i {
+        color: var(--cream) !important;
     }
 
     .volume-control {
         left: auto;
         right: 1rem;
         width: auto;
+        background: #1a1a1a !important;
+    }
+
+    .volume-slider {
+        background: rgba(245, 232, 220, 0.3) !important;
+    }
+
+    .volume-value {
+        color: var(--cream) !important;
     }
 
     /* Show when toggled */
     .search-box.active,
     .volume-control.active {
-        display: flex;
+        display: flex !important;
         animation: slideDown 0.3s ease;
     }
 
@@ -1554,22 +1574,23 @@ body {
     }
 
     .search-box {
-        padding: 0.8rem 1.2rem;
+        padding: 1rem 1.2rem;
     }
 
     .search-box input {
         width: 100%;
         flex: 1;
+        font-size: 1rem;
     }
 
     .volume-control {
-        padding: 0.8rem 1.2rem;
-        gap: 0.8rem;
+        padding: 1rem 1.2rem;
+        gap: 1rem;
         justify-content: center;
     }
 
     .volume-slider {
-        width: 120px;
+        width: 140px;
     }
 
     .volume-value {

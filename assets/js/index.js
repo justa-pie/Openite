@@ -159,8 +159,10 @@ function filterProducts(category) {
 }
 
 // Search Functionality
-const searchInput = document.querySelector('.search-box input');
-if (searchInput) {
+function initSearch() {
+    const searchInput = document.querySelector('.search-box input');
+    if (!searchInput) return;
+    
     searchInput.addEventListener('input', (e) => {
         const searchTerm = e.target.value.toLowerCase();
         const products = document.querySelectorAll('.product-card');
@@ -324,6 +326,9 @@ window.addEventListener('resize', () => {
 
 // Initialize - Show home page by default
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize search functionality
+    initSearch();
+    
     showPage('home');
     
     // Make sure all products are visible on page load
