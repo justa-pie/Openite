@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discord Decorations Gallery - Browse and explore Discord profile decorations, avatar decorations, nameplates, and profile effects">
+  <title>Discord Decorations Gallery 🎨</title>
+  <link rel="stylesheet" href="assets/js/deco.js">
+</head>
+<body>
+<body>
+  <div class="container">
+    <header>
+      <h1>🎨 Discord Decorations</h1>
+      <p class="subtitle">Beautiful profile decorations from Discord Shop</p>
+      <div class="stats">
+        <span id="total-count">0</span> decorations available
+      </div>
+    </header>
+
+    <div class="controls">
+      <div class="search-box">
+        <label for="search-input" class="sr-only">Search decorations</label>
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Tìm kiếm decoration..."
+          autocomplete="off"
+          aria-label="Search for decorations"
+        >
+      </div>
+
+      <div class="view-toggle" role="group" aria-label="Filter decorations by type">
+        <button class="filter-btn active" data-filter="all" aria-pressed="true">
+          🎨 All
+        </button>
+        <button class="filter-btn" data-filter="avatar_decoration" aria-pressed="false">
+          👤 Avatar
+        </button>
+        <button class="filter-btn" data-filter="nameplate" aria-pressed="false">
+          📛 Nameplate
+        </button>
+        <button class="filter-btn" data-filter="profile_effect" aria-pressed="false">
+          ✨ Profile FX
+        </button>
+      </div>
+
+      <div class="view-toggle" role="group" aria-label="Change view layout">
+        <button class="view-btn active" data-view="grid" aria-pressed="true">
+          📱 Grid
+        </button>
+        <button class="view-btn" data-view="list" aria-pressed="false">
+          📋 List
+        </button>
+      </div>
+    </div>
+
+    <div class="grid" id="decorations-grid" role="region" aria-live="polite" aria-label="Decorations gallery">
+      <div class="loading">⏳ Đang tải decorations...</div>
+    </div>
+  </div>
+
+  <div class="modal" id="detail-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close modal">✕</button>
+      <img id="modal-image" class="modal-image" src="" alt="Decoration preview">
+      <h2 id="modal-title" style="color: #5865f2; margin-bottom: 10px;"></h2>
+      <p id="modal-id" style="color: #666; font-family: monospace; margin-bottom: 20px;"></p>
+      <button class="btn" onclick="openInDiscord()">
+        🔗 Mở trong Discord
+      </button>
+    </div>
+  </div>
+  <script src="assets/js/deco.js"></script>
+</body>
+</html>

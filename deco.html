@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Discord Decorations — Openite</title>
+  <link rel="shortcut icon" href="assets/img/logo.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="assets/css/deco.css">
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <div class="top-bar">
+    <a href="index.html" class="back-btn">
+      <i class="fas fa-arrow-left"></i> Về Shop
+    </a>
+    <div class="top-bar-title">OPE<span>NITE</span> — Decorations</div>
+    <div class="top-bar-count"><span id="total-count">0</span> items</div>
+  </div>
+
+  <!-- Main -->
+  <div class="container">
+    <div class="controls">
+
+      <div class="search-box">
+        <i class="fas fa-search search-icon"></i>
+        <label for="search-input" class="sr-only">Search decorations</label>
+        <input type="text" id="search-input" placeholder="Tìm kiếm decoration..." autocomplete="off">
+      </div>
+
+      <div class="filter-group">
+        <button class="filter-btn active" data-filter="all">🎨 All</button>
+        <button class="filter-btn" data-filter="avatar_decoration">👤 Avatar</button>
+        <button class="filter-btn" data-filter="nameplate">📛 Nameplate</button>
+        <button class="filter-btn" data-filter="profile_effect">✨ Profile FX</button>
+      </div>
+
+      <div class="filter-group">
+        <button class="view-btn active" data-view="grid">
+          <i class="fas fa-th"></i> Grid
+        </button>
+        <button class="view-btn" data-view="list">
+          <i class="fas fa-list"></i> List
+        </button>
+      </div>
+
+    </div>
+
+    <div class="grid" id="decorations-grid">
+      <div class="loading">⏳ Đang tải decorations...</div>
+    </div>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="detail-modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <img id="modal-image" class="modal-image" src="" alt="Decoration preview">
+      <div class="modal-title" id="modal-title"></div>
+      <div class="modal-id" id="modal-id"></div>
+      <button class="btn" onclick="openInDiscord()">
+        <i class="fas fa-external-link-alt"></i> Mở trong Discord
+      </button>
+    </div>
+  </div>
+
+  <script src="assets/js/deco.js"></script>
+</body>
+</html>
