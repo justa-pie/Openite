@@ -114,10 +114,19 @@ function showPage(pageName) {
 
 // Filter Products by Category
 function filterProducts(category) {
-    // Switch to products page if not already there
+    console.log('Filtering by category:', category);
+    
+    // Switch to products page to show filtered results
     showPage('products');
     
+    // Scroll to top immediately
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
+    
     const products = document.querySelectorAll('.product-card');
+    const dividers = document.querySelectorAll('.product-divider');
     
     // Update active sidebar item
     const categoryItems = document.querySelectorAll('.category-item');
@@ -133,28 +142,36 @@ function filterProducts(category) {
         activeItem.classList.add('active');
     }
     
-    // Filter products with animation
+    // Simple and clear filtering - no fancy animations
     products.forEach(product => {
         const productCategory = product.getAttribute('data-category');
         
         if (category === 'all' || productCategory === category) {
-            product.style.display = 'block';
-            setTimeout(() => {
-                product.style.opacity = '1';
-                product.style.transform = 'translateY(0)';
-            }, 10);
+            product.style.display = 'flex';
+            product.style.opacity = '1';
+            product.style.transform = 'translateY(0)';
         } else {
-            product.style.opacity = '0';
-            product.style.transform = 'translateY(20px)';
-            setTimeout(() => {
-                product.style.display = 'none';
-            }, 300);
+            product.style.display = 'none';
+        }
+    });
+    
+    dividers.forEach(divider => {
+        const dividerCategory = divider.getAttribute('data-category');
+        
+        if (category === 'all' || dividerCategory === category) {
+            divider.style.display = 'flex';
+            divider.style.opacity = '1';
+        } else {
+            divider.style.display = 'none';
         }
     });
     
     // Close sidebar on mobile
     if (window.innerWidth <= 1024) {
-        toggleSidebar();
+        const sidebar = document.getElementById('sidebar');
+        if (sidebar) {
+            sidebar.classList.remove('active');
+        }
     }
 }
 
@@ -249,17 +266,21 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
         const href = this.getAttribute('href');
         
-        // Don't prevent default for Discord link placeholder
-        if (href === '#DISCORD_LINK') {
+        // Don't prevent default for Discord link placeholder or empty hash
+        if (href === '#DISCORD_LINK' || href === '#' || !href || href.length <= 1) {
             return;
         }
         
         e.preventDefault();
-        const target = document.querySelector(href);
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
+        try {
+            const target = document.querySelector(href);
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        } catch (err) {
+            console.warn('Invalid selector:', href);
         }
     });
 });
@@ -423,5 +444,47 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (volumeIconMobile) volumeIconMobile.className = iconClass;
             }
         });
+    }
+});
+// Product Detail Modal Functions
+function showProductDetail(card) {
+    const modal = document.getElementById('productModal');
+    if (!modal) return;
+    
+    const image = card.querySelector('.product-image img');
+    const name = card.querySelector('.product-name');
+    const description = card.querySelector('.product-description');
+    const price = card.querySelector('.product-price');
+    const stockBadge = card.querySelector('.stock-badge');
+    
+    if (image) document.getElementById('modalProductImage').src = image.src;
+    if (name) document.getElementById('modalProductName').textContent = name.textContent;
+    if (description) document.getElementById('modalProductDescription').textContent = description.textContent;
+    if (price) document.getElementById('modalProductPrice').textContent = price.textContent;
+    
+    const modalStockBadge = document.getElementById('modalStockBadge');
+    if (stockBadge && modalStockBadge) {
+        modalStockBadge.textContent = stockBadge.textContent;
+        modalStockBadge.className = stockBadge.className;
+        modalStockBadge.style.display = 'block';
+    } else if (modalStockBadge) {
+        modalStockBadge.style.display = 'none';
+    }
+    
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeProductModal() {
+    const modal = document.getElementById('productModal');
+    if (modal) {
+        modal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+        closeProductModal();
     }
 });
