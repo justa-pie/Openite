@@ -1,334 +1,247 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs').promises;
+const fsSync = require('fs');
 
 console.log('╔════════════════════════════════════════╗');
-console.log('║  Discord Scraper v2 - Network Mode    ║');
+console.log('║  Discord Scraper v4 - Bundle Images   ║');
 console.log('╚════════════════════════════════════════╝\n');
 
 async function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise(r => setTimeout(r, ms));
 }
 
 async function main() {
   let browser;
-  const decorationsData = [];
-  
   try {
-    console.log('🚀 Đang mở browser...');
     browser = await puppeteer.launch({
       headless: false,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-blink-features=AutomationControlled',
-        '--disable-dev-shm-usage'
-      ],
-      defaultViewport: null
+      args: ['--no-sandbox', '--disable-setuid-sandbox',
+             '--disable-blink-features=AutomationControlled'],
+      defaultViewport: null,
     });
-    
+
     const page = await browser.newPage();
-    
-    // Setup network interception để bắt API calls
+
+    // ── Intercept ALL API responses passively ─────────────────────────
+    const capturedResponses = [];
+    const capturedUrls = new Set();
+
     await page.setRequestInterception(true);
-    
-    page.on('request', request => {
-      request.continue();
-    });
-    
+    page.on('request', req => req.continue());
+
     page.on('response', async response => {
       const url = response.url();
-      
-      // Bắt các API calls liên quan đến shop/store
-      if (url.includes('/store') || 
-          url.includes('/shop') || 
-          url.includes('/avatar-decoration') ||
-          url.includes('/collectibles') ||
-          url.includes('/products')) {
-        
-        try {
-          const contentType = response.headers()['content-type'];
-          if (contentType && contentType.includes('application/json')) {
-            const json = await response.json();
-            console.log(`\n📡 API Call: ${url.substring(0, 80)}...`);
-            console.log(`Response type: ${typeof json}`);
-            
-            // Lưu response để debug
-            if (json) {
-              decorationsData.push({
-                url: url,
-                data: json
-              });
-            }
-          }
-        } catch (e) {
-          // Ignore errors
-        }
-      }
+      if (!url.includes('/api/v9/')) return;
+      if (capturedUrls.has(url)) return;
+
+      const patterns = [
+        '/collectibles-categories',
+        '/collectibles-shop',
+        '/collectibles-purchases',
+        '/collectibles-marketing',
+        '/store/published-listings',  // bundle listing images
+      ];
+      if (!patterns.some(p => url.includes(p))) return;
+
+      try {
+        const ct = response.headers()['content-type'] || '';
+        if (!ct.includes('application/json')) return;
+        const json = await response.json();
+        if (!json) return;
+        capturedUrls.add(url);
+        capturedResponses.push({ url, data: json });
+        const short = url.replace('https://discord.com/api/v9', '').split('?')[0];
+        console.log(`  📡 ${short}`);
+      } catch (_) {}
     });
-    
-    // Giả mạo user agent
-    await page.setUserAgent('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36');
-    
-    // Ẩn automation
+
+    await page.setUserAgent(
+      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36'
+    );
     await page.evaluateOnNewDocument(() => {
       Object.defineProperty(navigator, 'webdriver', { get: () => false });
     });
-    
-    console.log('🌐 Đang mở Discord...');
-    await page.goto('https://discord.com/login', { 
-      waitUntil: 'networkidle2',
-      timeout: 60000 
-    });
-    
-    console.log('\n⏳ VUI LÒNG ĐĂNG NHẬP DISCORD...');
-    console.log('(Đợi bạn login xong, script sẽ tự chạy)\n');
-    
+
+    // ── Login ─────────────────────────────────────────────────────────
+    console.log('🌐 Mở Discord...');
+    await page.goto('https://discord.com/login', { waitUntil: 'networkidle2', timeout: 60000 });
+    console.log('\n⏳ VUI LÒNG ĐĂNG NHẬP...');
     await page.waitForFunction(
       () => window.location.pathname.includes('@me') || window.location.pathname.includes('/channels'),
       { timeout: 300000 }
     );
-    
     console.log('✅ Đã login!\n');
     await sleep(3000);
-    
-    console.log('🛍️  Đang vào shop...');
-    await page.goto('https://discord.com/shop', { 
-      waitUntil: 'networkidle0',
-      timeout: 60000 
-    });
-    
-    console.log('⏳ Đang đợi shop load (10 giây)...');
-    await sleep(10000); // Đợi lâu hơn để API calls hoàn tất
-    
-    console.log('📜 Đang scroll...');
+
+    // ── Load shop to capture main collectibles endpoints ──────────────
+    console.log('🛍️  Vào shop...');
+    await page.goto('https://discord.com/shop', { waitUntil: 'networkidle0', timeout: 60000 });
+    await sleep(6000);
     await page.evaluate(async () => {
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 4; i++) {
         window.scrollTo(0, document.body.scrollHeight);
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(r => setTimeout(r, 1200));
       }
     });
-    
-    await sleep(5000);
-    
-    console.log('\n🔍 Đang phân tích trang...\n');
-    
-    // Thử nhiều cách khác nhau để tìm decorations
-    const result = await page.evaluate(() => {
-      const items = [];
-      
-      // Method 1: Tìm theo class patterns
-      const patterns = [
-        '[class*="product"]',
-        '[class*="item"]',
-        '[class*="card"]',
-        '[class*="decoration"]',
-        '[class*="avatar"]',
-        '[data-list-item-id]',
-        'article',
-        '[role="article"]',
-        '[role="listitem"]'
-      ];
-      
-      for (const pattern of patterns) {
-        const elements = document.querySelectorAll(pattern);
-        console.log(`Pattern "${pattern}": ${elements.length} elements`);
-        
-        elements.forEach(el => {
-          // Tìm images
-          const imgs = el.querySelectorAll('img');
-          imgs.forEach(img => {
-            if (img.src && (img.src.includes('discord') || img.src.includes('cdn'))) {
-              const name = img.alt || el.textContent?.trim().substring(0, 50) || 'Unknown';
-              
-              // Tìm ID từ URL hoặc data attributes
-              let id = null;
-              const href = el.querySelector('a')?.href || el.closest('a')?.href;
-              
-              if (href) {
-                const match = href.match(/itemSkuId=(\d+)/);
-                id = match ? match[1] : null;
-              }
-              
-              // Thử tìm ID từ data attributes
-              if (!id) {
-                id = el.getAttribute('data-id') || 
-                     el.getAttribute('data-sku-id') ||
-                     el.getAttribute('data-item-id') ||
-                     img.src.match(/\/(\d+)\./)?.[1];
-              }
-              
-              if (id && !items.find(i => i.id === id)) {
-                items.push({
-                  id: id,
-                  name: name.replace(/\s+/g, ' ').trim(),
-                  image: img.src,
-                  url: href || `https://discord.com/shop`
-                });
-              }
-            }
-          });
-        });
-        
-        if (items.length > 0) break;
-      }
-      
-      return {
-        items: items,
-        htmlSample: document.body.innerHTML.substring(0, 2000)
-      };
-    });
-    
-    console.log(`✨ Tìm thấy: ${result.items.length} decorations từ DOM\n`);
-    
-    // Lưu API data để debug
-    if (decorationsData.length > 0) {
-      await fs.writeFile(
-        'api-responses.json', 
-        JSON.stringify(decorationsData, null, 2)
-      );
-      console.log('💾 Đã lưu API responses: api-responses.json');
+    await sleep(2000);
+    console.log(`  ✅ Phase 1: ${capturedResponses.length} responses\n`);
+
+    // ── Get bundle SKUs ───────────────────────────────────────────────
+    let bundleSkus = [];
+    const allSources = [...capturedResponses];
+    if (fsSync.existsSync('api-responses.json')) {
+      const prev = JSON.parse(fsSync.readFileSync('api-responses.json', 'utf8'));
+      allSources.push(...prev);
     }
-    
-    let finalDecorations = result.items;
-    
-    // Nếu không tìm thấy gì, thử parse từ API data
-    if (finalDecorations.length === 0 && decorationsData.length > 0) {
-      console.log('\n🔄 Đang thử parse từ API responses...');
-      
-      for (const apiData of decorationsData) {
-        try {
-          const data = apiData.data;
-          
-          // Thử tìm decorations trong response
-          const findDecorations = (obj, path = '') => {
-            if (Array.isArray(obj)) {
-              obj.forEach((item, index) => {
-                if (item && typeof item === 'object') {
-                  // Check if this looks like a decoration
-                  if (item.sku_id || item.id || item.name) {
-                    finalDecorations.push({
-                      id: item.sku_id || item.id || `unknown-${index}`,
-                      name: item.name || item.title || `Decoration ${index}`,
-                      image: item.preview_url || item.image_url || item.image || '',
-                      url: `https://discord.com/shop#itemSkuId=${item.sku_id || item.id}`
-                    });
-                  }
-                  findDecorations(item, `${path}[${index}]`);
-                }
+    for (const resp of allSources) {
+      const d = resp.data;
+      if (d?.categories)
+        for (const cat of d.categories)
+          for (const prod of (cat.products || []))
+            if (prod.type === 1000 && !bundleSkus.includes(prod.sku_id))
+              bundleSkus.push(prod.sku_id);
+    }
+    console.log(`📦 ${bundleSkus.length} bundles cần fetch\n`);
+
+    if (bundleSkus.length === 0) {
+      console.log('⚠️  Không tìm thấy bundle SKUs. Kiểm tra lại api-responses.json');
+    }
+
+    // ── Navigate to each bundle page to trigger store-listing API ─────
+    // Strategy: use Discord's own shop URL with itemSkuId hash
+    // This makes Discord's app call /store/published-listings/sku/{id} automatically
+    console.log('🖼️  Đang trigger store-listing API cho từng bundle...');
+    console.log('   (Phương pháp: navigate đến từng bundle URL)\n');
+
+    let fetched = 0;
+    const BATCH = 10; // process in batches, navigating quickly
+
+    for (let i = 0; i < bundleSkus.length; i++) {
+      const sku = bundleSkus[i];
+      const url = `https://discord.com/shop#itemSkuId=${sku}`;
+
+      try {
+        // Navigate and wait briefly for the API call to fire
+        await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 15000 });
+        await sleep(1200); // give time for store-listing fetch
+        fetched++;
+
+        if (fetched % BATCH === 0) {
+          console.log(`   ${fetched}/${bundleSkus.length} bundles...`);
+        }
+      } catch (e) {
+        // timeout or nav error - continue
+      }
+    }
+    console.log(`\n  ✅ Navigated ${fetched} bundle pages`);
+    await sleep(2000);
+
+    // ── Extract bundle images from captured store-listing responses ────
+    const bundleImages = {};
+    let imgCount = 0;
+
+    for (const resp of capturedResponses) {
+      if (!resp.url.includes('/store/published-listings/sku/')) continue;
+      const sku = resp.url.split('/store/published-listings/sku/')[1]?.split('?')[0];
+      if (!sku) continue;
+
+      const d = resp.data;
+      // Published listing structure varies — check common image fields
+      const imgUrl =
+        d?.summary?.thumbnail?.url                   ||
+        d?.summary?.thumbnail                         ||
+        d?.summary?.box_art?.url                      ||
+        d?.summary?.header_background?.url            ||
+        d?.sku?.thumbnail?.url                        ||
+        d?.listing?.summary?.thumbnail?.url           ||
+        d?.thumbnail?.url                             ||
+        null;
+
+      if (imgUrl && typeof imgUrl === 'string') {
+        bundleImages[sku] = imgUrl;
+        imgCount++;
+      }
+    }
+
+    console.log(`\n🖼️  Bundle images captured: ${imgCount}/${bundleSkus.length}`);
+
+    // If passive capture missed some, log sample listing structure for debugging
+    if (imgCount === 0) {
+      const sampleListing = capturedResponses.find(r => r.url.includes('/store/published-listings/sku/'));
+      if (sampleListing) {
+        console.log('\n  DEBUG - Sample listing structure:');
+        console.log('  Keys:', Object.keys(sampleListing.data));
+        if (sampleListing.data.summary) {
+          console.log('  summary keys:', Object.keys(sampleListing.data.summary));
+        }
+        console.log('  Full (first 500 chars):', JSON.stringify(sampleListing.data).slice(0, 500));
+      } else {
+        console.log('\n  ⚠️  No store-listing responses were captured.');
+        console.log('  Discord may not call this endpoint via page navigation.');
+        console.log('  Will try direct XMLHttpRequest approach...\n');
+
+        // Fallback: use XMLHttpRequest inside browser (uses session cookies automatically)
+        console.log('  Trying XHR fallback for first 5 bundles...');
+        for (const sku of bundleSkus.slice(0, 5)) {
+          try {
+            const result = await page.evaluate(async (skuId) => {
+              return new Promise((resolve) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', `/api/v9/store/published-listings/sku/${skuId}`, true);
+                xhr.withCredentials = true;
+                xhr.onload = () => {
+                  try { resolve({ status: xhr.status, data: JSON.parse(xhr.responseText) }); }
+                  catch (e) { resolve({ status: xhr.status, error: xhr.responseText.slice(0, 200) }); }
+                };
+                xhr.onerror = () => resolve({ status: 0, error: 'XHR error' });
+                xhr.send();
               });
-            } else if (obj && typeof obj === 'object') {
-              Object.keys(obj).forEach(key => {
-                if (typeof obj[key] === 'object') {
-                  findDecorations(obj[key], `${path}.${key}`);
-                }
-              });
+            }, sku);
+
+            console.log(`  SKU ${sku}: status=${result.status}`);
+            if (result.status === 200) {
+              console.log('  Keys:', Object.keys(result.data));
+              console.log('  Sample:', JSON.stringify(result.data).slice(0, 300));
+            } else {
+              console.log('  Error:', result.error?.slice(0, 100));
             }
-          };
-          
-          findDecorations(data);
-        } catch (e) {
-          console.log('Error parsing API data:', e.message);
+          } catch (e) {
+            console.log(`  SKU ${sku}: exception - ${e.message}`);
+          }
+          await sleep(300);
         }
       }
-      
-      // Remove duplicates
-      finalDecorations = Array.from(
-        new Map(finalDecorations.map(item => [item.id, item])).values()
-      );
-      
-      console.log(`✨ Tìm thấy thêm: ${finalDecorations.length} decorations từ API\n`);
     }
-    
-    if (finalDecorations.length === 0) {
-      console.log('⚠️  KHÔNG TÌM THẤY DECORATIONS!\n');
-      console.log('Có thể do:');
-      console.log('1. ❌ Tài khoản chưa có quyền truy cập shop');
-      console.log('2. ❌ Shop chưa available ở region của bạn');
-      console.log('3. ❌ Discord thay đổi hoàn toàn cấu trúc');
-      console.log('4. ❌ Cần Discord Nitro để xem shop\n');
-      
-      // Screenshot để debug
-      await page.screenshot({ path: 'debug-screenshot.png', fullPage: true });
-      console.log('📸 Screenshot: debug-screenshot.png');
-      
-      const html = await page.content();
-      await fs.writeFile('debug-page.html', html);
-      console.log('📄 HTML: debug-page.html');
-      
-      // Save HTML sample
-      console.log('\n📝 HTML Sample:');
-      console.log(result.htmlSample);
-      console.log('\n');
-      
+
+    // ── Save results ─────────────────────────────────────────────────
+    await fs.writeFile('bundle-images.json', JSON.stringify(bundleImages, null, 2));
+    console.log('\n💾 bundle-images.json saved');
+
+    // Merge and save api-responses.json
+    let finalResponses = [...capturedResponses];
+    if (fsSync.existsSync('api-responses.json')) {
+      const prev = JSON.parse(fsSync.readFileSync('api-responses.json', 'utf8'));
+      const existUrls = new Set(capturedResponses.map(r => r.url));
+      for (const r of prev) {
+        if (!existUrls.has(r.url)) finalResponses.push(r);
+      }
+    }
+    await fs.writeFile('api-responses.json', JSON.stringify(finalResponses, null, 2));
+    console.log('💾 api-responses.json updated\n');
+
+    console.log(`📊 Tổng: ${imgCount} bundle images`);
+    if (imgCount > 0) {
+      console.log('🎯 Tiếp theo: node parse-with-pricing.js && node inject-data.js\n');
     } else {
-      // Save data
-      const fullData = {
-        scrapedAt: new Date().toISOString(),
-        total: finalDecorations.length,
-        decorations: finalDecorations
-      };
-      
-      await fs.writeFile('decorations.json', JSON.stringify(fullData, null, 2));
-      console.log('💾 Đã lưu: decorations.json');
-      
-      await fs.writeFile('decorations-simple.json', JSON.stringify(finalDecorations, null, 2));
-      console.log('💾 Đã lưu: decorations-simple.json');
-      
-      // Create preview
-      const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Discord Decorations - ${finalDecorations.length} items</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: system-ui; background: #1e1e1e; color: #fff; padding: 20px; }
-    h1 { text-align: center; margin-bottom: 20px; color: #5865f2; }
-    .stats { text-align: center; margin-bottom: 30px; color: #aaa; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; max-width: 1400px; margin: 0 auto; }
-    .card { background: #2a2a2a; border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s; }
-    .card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(88, 101, 242, 0.3); }
-    .card img { width: 100%; height: 200px; object-fit: contain; background: #1a1a1a; }
-    .card-body { padding: 15px; }
-    .card-title { font-weight: 600; margin-bottom: 8px; color: #5865f2; }
-    .card-id { font-size: 0.8em; color: #666; }
-  </style>
-</head>
-<body>
-  <h1>🎨 Discord Decorations</h1>
-  <div class="stats">Total: ${finalDecorations.length} decorations | ${new Date().toLocaleDateString('vi-VN')}</div>
-  <div class="grid">
-    ${finalDecorations.map(d => `
-      <div class="card" onclick="window.open('${d.url}', '_blank')">
-        <img src="${d.image}" alt="${d.name}" onerror="this.style.display='none'">
-        <div class="card-body">
-          <div class="card-title">${d.name}</div>
-          <div class="card-id">ID: ${d.id}</div>
-        </div>
-      </div>
-    `).join('')}
-  </div>
-</body>
-</html>`;
-      
-      await fs.writeFile('preview.html', html);
-      console.log('💾 Đã lưu: preview.html');
-      
-      console.log('\n✅ HOÀN TẤT!');
-      console.log(`📊 Tổng cộng: ${finalDecorations.length} decorations\n`);
+      console.log('⚠️  Chưa lấy được hình bundle. Xem debug output ở trên.\n');
     }
-    
-  } catch (error) {
-    console.error('\n❌ Lỗi:', error.message);
-    console.error('Stack:', error.stack);
+
+  } catch (err) {
+    console.error('\n❌ Lỗi:', err.message);
   } finally {
-    console.log('\n⏸️  Nhấn Enter để đóng browser...');
-    await new Promise(resolve => process.stdin.once('data', resolve));
-    
-    if (browser) {
-      await browser.close();
-      console.log('👋 Đã đóng browser\n');
-    }
+    console.log('⏸️  Nhấn Enter để đóng...');
+    await new Promise(r => process.stdin.once('data', r));
+    if (browser) await browser.close();
   }
 }
 

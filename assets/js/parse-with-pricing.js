@@ -12,8 +12,7 @@ function extractPricing(pricesObj) {
     const prices = pricesObj[key]?.country_prices?.prices;
     if (!prices?.[0]) continue;
     const p = prices[0];
-    const exp = p.exponent || 0;
-    r[label]   = exp ? p.amount / Math.pow(10, exp) : p.amount;
+    r[label]   = p.exponent ? p.amount / Math.pow(10, p.exponent) : p.amount;
     r.currency = (p.currency || 'VND').toUpperCase();
   }
   return (r.regular || r.nitro) ? r : null;
@@ -28,6 +27,26 @@ else { console.error('❌ Không tìm thấy API data file!'); process.exit(1); 
 console.log(`📖 Đang đọc ${filename}...`);
 const apiData = JSON.parse(fs.readFileSync(filename, 'utf8'));
 console.log(`✅ Đọc thành công (${apiData.length} responses)\n`);
+
+// ── Load bundle images if available ─────────────────────────────────
+let bundleImages = {};
+if (fs.existsSync('bundle-images.json')) {
+  bundleImages = JSON.parse(fs.readFileSync('bundle-images.json', 'utf8'));
+  console.log(`🖼️  Loaded ${Object.keys(bundleImages).length} bundle images từ bundle-images.json\n`);
+} else {
+  // Try extracting from api-responses if scrape-browser v3 was run
+  for (const resp of apiData) {
+    if (resp.url === 'bundle-listings-compiled' && resp.data?.bundleImages) {
+      bundleImages = resp.data.bundleImages;
+      console.log(`🖼️  Loaded ${Object.keys(bundleImages).length} bundle images từ api-responses.json\n`);
+      break;
+    }
+  }
+  if (!Object.keys(bundleImages).length) {
+    console.log('ℹ️  bundle-images.json chưa có — bundle sẽ dùng ảnh nameplate/avatar thay thế.');
+    console.log('   Chạy scrape-browser.js v3 để có ảnh bundle chính xác.\n');
+  }
+}
 
 const decorations = [];
 const seenIds = new Set();
@@ -45,7 +64,6 @@ function addItem(id, name, image, type, typeLabel, isAnimated, asset, rawType, p
   return true;
 }
 
-// ── Process one sub-item with given name and pricing ──────────────────
 function processSubItem(it, pricing, name) {
   const t = it.type;
   if (t === 0) {
@@ -69,7 +87,7 @@ function processSubItem(it, pricing, name) {
   }
 }
 
-// ── Collect all products from all responses ───────────────────────────
+// ── Collect all products ──────────────────────────────────────────────
 const allProducts = [];
 for (const response of apiData) {
   const d = response.data;
@@ -83,20 +101,17 @@ for (const response of apiData) {
         for (const prod of (sub.products || sub.items || []))
           allProducts.push(prod);
 }
-
 console.log(`🔍 Tổng products: ${allProducts.length}\n`);
 
-// ═══════════════════════════════════════════════════════════════════
-//  PASS 1: STANDALONE products (type != 1000) — correct name + price
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  PASS 1: STANDALONE — correct name + correct price
+// ═══════════════════════════════════════════════════════
 console.log('Pass 1: Standalone products...');
 for (const prod of allProducts) {
-  if (prod.type === 1000) continue;  // skip bundles
-
+  if (prod.type === 1000) continue;
   const prodName    = prod.name || '';
   const prodPricing = extractPricing(prod.prices);
 
-  // Products with variants (e.g. type 2000 - color variants)
   if (prod.variants?.length) {
     for (const variant of prod.variants) {
       const vName    = variant.name || prodName;
@@ -106,41 +121,38 @@ for (const prod of allProducts) {
     }
     continue;
   }
-
-  // Regular standalone: items inside the product
   for (const it of (prod.items || []))
     processSubItem(it, prodPricing, prodName);
 }
-
 const afterPass1 = decorations.length;
-console.log(`   ✅ ${afterPass1} items added\n`);
+console.log(`   ✅ ${afterPass1} standalone items\n`);
 
-// ═══════════════════════════════════════════════════════════════════
-//  PASS 2: BUNDLES (type 1000) — add bundle itself, skip sub-items
-//          (sub-items already exist from Pass 1 with correct prices)
-// ═══════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════
+//  PASS 2: BUNDLES — add bundle itself only
+// ═══════════════════════════════════════════════════════
 console.log('Pass 2: Bundles...');
 for (const prod of allProducts) {
   if (prod.type !== 1000) continue;
-
   const items   = prod.items || [];
   const pricing = extractPricing(prod.prices);
+  const sku     = String(prod.sku_id);
 
-  // Choose best preview image for the bundle card
+  // Best bundle image: from bundle-images.json (store listing) → nameplate → avatar → fx
   const plateItem  = items.find(it => it.type === 2);
   const avatarItem = items.find(it => it.type === 0);
   const fxItem     = items.find(it => it.type === 1);
 
-  let bundleImage =
-    plateItem?.assets?.animated_image_url  ||
-    avatarItem?.assets?.animated_image_url ||
-    fxItem?.thumbnailPreviewSrc            || '';
+  const bundleImage =
+    bundleImages[sku]                          ||   // ← real bundle store listing image
+    plateItem?.assets?.animated_image_url      ||
+    avatarItem?.assets?.animated_image_url     ||
+    fxItem?.thumbnailPreviewSrc                || '';
 
   const includedTypes = items.map(it =>
     it.type === 0 ? 'Avatar' : it.type === 2 ? 'Nameplate' : 'Profile FX'
   );
 
-  addItem(prod.sku_id, prod.name || '', bundleImage,
+  addItem(sku, prod.name || '', bundleImage,
     'bundle', '📦 Bundle', true, null, 1000, pricing, {
       bundleItems: items.map(it => ({
         sku_id: String(it.sku_id || it.id),
@@ -150,9 +162,7 @@ for (const prod of allProducts) {
     }
   );
 }
-
-const bundlesAdded = decorations.length - afterPass1;
-console.log(`   ✅ ${bundlesAdded} bundles added\n`);
+console.log(`   ✅ ${decorations.length - afterPass1} bundles\n`);
 
 // ── Stats ─────────────────────────────────────────────────────────────
 const stats = {
@@ -162,28 +172,18 @@ const stats = {
   nameplates:        decorations.filter(d => d.type === 'nameplate').length,
   profileEffects:    decorations.filter(d => d.type === 'profile_effect').length,
   withPricing:       decorations.filter(d => d.pricing).length,
+  bundlesWithImages: decorations.filter(d => d.type === 'bundle' && d.image).length,
 };
 
 console.log('📊 KẾT QUẢ:');
-console.log(`   📦 Bundles            : ${stats.bundles}`);
-console.log(`   👤 Avatar Decorations : ${stats.avatarDecorations}`);
-console.log(`   📛 Nameplates         : ${stats.nameplates}`);
-console.log(`   ✨ Profile Effects    : ${stats.profileEffects}`);
-console.log(`   💰 With Pricing       : ${stats.withPricing}`);
-console.log(`   📦 TOTAL              : ${stats.total}\n`);
+console.log(`   📦 Bundles           : ${stats.bundles} (${stats.bundlesWithImages} có hình)`);
+console.log(`   👤 Avatar Decorations: ${stats.avatarDecorations}`);
+console.log(`   📛 Nameplates        : ${stats.nameplates}`);
+console.log(`   ✨ Profile Effects   : ${stats.profileEffects}`);
+console.log(`   💰 With Pricing      : ${stats.withPricing}`);
+console.log(`   📦 TOTAL             : ${stats.total}\n`);
 
-// Spot-check
-console.log('🔎 SPOT CHECK:');
-['avatar_decoration','nameplate','profile_effect','bundle'].forEach(type => {
-  const sample = decorations.filter(d => d.type === type).slice(0,2);
-  sample.forEach(d => {
-    const p = d.pricing;
-    console.log(`   [${type}] "${d.name}" — ${p ? p.regular?.toLocaleString()+' '+p.currency : 'no price'}`);
-  });
-});
-console.log();
-
-// ── Save ──────────────────────────────────────────────────────────────
+// Save
 console.log('💾 Đang lưu...');
 fs.writeFileSync('decorations-simple.json', JSON.stringify(decorations, null, 2));
 console.log('✅ decorations-simple.json');
