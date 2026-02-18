@@ -23885,256 +23885,399 @@ const DECORATIONS_DATA = [
 ];
 
 
-    let currentData = [];
-    let currentView = 'grid';
-    let selectedDecoration = null;
 
-    function getProxiedImageUrl(url) {
-      if (!url) return '';
-      
-      if (url.includes('cdn.discordapp.com')) {
-        if (url.includes('.gif')) {
-          return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400`;
-        }
-        return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400&output=webp`;
+// ═══════════════════════════════════════════════
+//  DECO PAGE LOGIC — Updated with pagination
+// ═══════════════════════════════════════════════
+
+const ITEMS_PER_PAGE = 50;
+
+let currentData = [];
+let currentPage = 1;
+let currentFilter = 'all';
+let currentView = 'grid';
+let selectedDecoration = null;
+
+// ─── Image helpers ─────────────────────────────
+function getProxiedImageUrl(url) {
+  if (!url) return '';
+  if (url.includes('cdn.discordapp.com')) {
+    if (url.includes('.gif')) return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400`;
+    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400&output=webp`;
+  }
+  return url;
+}
+
+function getImageWithFallbacks(decoration) {
+  const id = decoration.id;
+  const urls = [
+    decoration.image,
+    `https://cdn.discordapp.com/avatar-decoration-presets/a_${id}.gif?size=240&passthrough=true`,
+    `https://cdn.discordapp.com/avatar-decoration-presets/${id}.png?size=240&passthrough=true`,
+    `https://cdn.discordapp.com/avatar-decoration-presets/${id}.png`,
+  ].filter(Boolean);
+  return urls.map(u => getProxiedImageUrl(u));
+}
+
+// ─── Init ─────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  // Count badges in sidebar
+  const countAvatar = DECORATIONS_DATA.filter(d => d.type === 'avatar_decoration').length;
+  const countName   = DECORATIONS_DATA.filter(d => d.type === 'nameplate').length;
+  const countFX     = DECORATIONS_DATA.filter(d => d.type === 'profile_effect').length;
+  const countAll    = DECORATIONS_DATA.length;
+
+  if (document.getElementById('count-all'))      document.getElementById('count-all').textContent = countAll;
+  if (document.getElementById('count-avatar'))   document.getElementById('count-avatar').textContent = countAvatar;
+  if (document.getElementById('count-nameplate'))document.getElementById('count-nameplate').textContent = countName;
+  if (document.getElementById('count-effect'))   document.getElementById('count-effect').textContent = countFX;
+
+  // Set initial sidebar active
+  document.getElementById('sidebar-all')?.classList.add('active');
+
+  applyFilters();
+  setupEventListeners();
+});
+
+// ─── Filter & Render ──────────────────────────
+function applyFilters() {
+  const searchQuery = (document.getElementById('search-input')?.value || '').toLowerCase().trim();
+
+  let filtered = DECORATIONS_DATA;
+  if (currentFilter !== 'all') {
+    filtered = filtered.filter(d => d.type === currentFilter);
+  }
+  if (searchQuery) {
+    filtered = filtered.filter(d =>
+      d.name.toLowerCase().includes(searchQuery) || d.id.includes(searchQuery)
+    );
+  }
+
+  currentData = filtered;
+  currentPage = 1;
+
+  const totalEl = document.getElementById('total-count');
+  if (totalEl) totalEl.textContent = filtered.length;
+
+  renderPage();
+  renderPagination();
+}
+
+function renderPage() {
+  const grid = document.getElementById('decorations-grid');
+  if (!grid) return;
+  grid.style.display = 'grid';
+
+  const start = (currentPage - 1) * ITEMS_PER_PAGE;
+  const pageData = currentData.slice(start, start + ITEMS_PER_PAGE);
+
+  if (currentData.length === 0) {
+    grid.innerHTML = `
+      <div class="deco-empty">
+        <div class="deco-empty-icon">🔍</div>
+        <h3>Không tìm thấy decoration nào</h3>
+        <p>Thử tìm kiếm với từ khóa khác</p>
+      </div>`;
+    return;
+  }
+
+  grid.innerHTML = pageData.map(decoration => {
+    const fallbackUrls = getImageWithFallbacks(decoration);
+    const primaryUrl   = fallbackUrls[0];
+
+    const typeLabel = decoration.typeLabel ||
+      (decoration.type === 'avatar_decoration' ? '👤 Avatar' :
+       decoration.type === 'nameplate'         ? '📛 Nameplate' :
+       decoration.type === 'profile_effect'    ? '✨ Profile FX' : '🎨');
+
+    let pricingHTML = '';
+    if (decoration.pricing?.regular) {
+      if (decoration.pricing.nitro && decoration.pricing.nitro < decoration.pricing.regular) {
+        const disc = Math.round((1 - decoration.pricing.nitro / decoration.pricing.regular) * 100);
+        pricingHTML = `
+          <div class="deco-card-pricing">
+            <span class="price-regular">${decoration.pricing.regular.toLocaleString()} ${decoration.pricing.currency}</span>
+            <span class="price-nitro">${decoration.pricing.nitro.toLocaleString()} ${decoration.pricing.currency}</span>
+            <span class="price-badge">-${disc}%</span>
+          </div>`;
+      } else {
+        pricingHTML = `
+          <div class="deco-card-pricing">
+            <span class="price-single">${decoration.pricing.regular.toLocaleString()} ${decoration.pricing.currency}</span>
+          </div>`;
       }
-      
-      return url;
-    }
-    
-    function getImageWithFallbacks(decoration) {
-      const id = decoration.id;
-      const originalUrl = decoration.image;
-      
-      const urls = [
-        originalUrl,
-        `https://cdn.discordapp.com/avatar-decoration-presets/a_${id}.gif?size=240&passthrough=true`,
-        `https://cdn.discordapp.com/avatar-decoration-presets/${id}.png?size=240&passthrough=true`,
-        `https://cdn.discordapp.com/avatar-decoration-presets/${id}.png`,
-      ].filter(Boolean);
-      
-      return urls.map(u => getProxiedImageUrl(u));
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      loadDecorations();
-      setupEventListeners();
-    });
-
-    function loadDecorations() {
-      currentData = DECORATIONS_DATA;
-      document.getElementById('total-count').textContent = currentData.length;
-      renderDecorations(currentData);
-    }
-
-    function renderDecorations(data) {
-      const grid = document.getElementById('decorations-grid');
-
-      if (data.length === 0) {
-        grid.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon" role="img" aria-label="No results">🔍</div>
-            <h3>Không tìm thấy decoration nào</h3>
-            <p>Thử tìm kiếm với từ khóa khác</p>
-          </div>
-        `;
-        return;
-      }
-
-      grid.innerHTML = data.map(decoration => {
-        const fallbackUrls = getImageWithFallbacks(decoration);
-        const primaryUrl = fallbackUrls[0];
-        
-        const typeLabel = decoration.typeLabel || 
-                          (decoration.type === 'avatar_decoration' ? '👤 Avatar Deco' : 
-                          decoration.type === 'nameplate' ? '📛 Nameplate' :
-                          decoration.type === 'profile_effect' ? '✨ Profile Effect' : '🎨 Decoration');
-        
-        let pricingHTML = '';
-        if (decoration.pricing && decoration.pricing.regular) {
-          if (decoration.pricing.nitro && decoration.pricing.nitro < decoration.pricing.regular) {
-            const discount = Math.round((1 - decoration.pricing.nitro / decoration.pricing.regular) * 100);
-            pricingHTML = `
-              <div class="card-pricing">
-                <span class="price-regular">${decoration.pricing.regular.toLocaleString()} ${decoration.pricing.currency}</span>
-                <span class="price-nitro">${decoration.pricing.nitro.toLocaleString()} ${decoration.pricing.currency}</span>
-                <span class="price-badge">-${discount}%</span>
-              </div>
-            `;
-          } else {
-            pricingHTML = `
-              <div class="card-pricing">
-                <span class="price-single">${decoration.pricing.regular.toLocaleString()} ${decoration.pricing.currency}</span>
-              </div>
-            `;
-          }
-        }
-        
-        return `
-        <div class="card" onclick="showDetail('${decoration.id}')" data-type="${decoration.type || 'decoration'}">
-          <div class="card-image">
-            <span class="type-badge">${typeLabel}</span>
-            <img
-              src="${primaryUrl}"
-              alt="${decoration.name}"
-              data-fallbacks='${JSON.stringify(fallbackUrls.slice(1))}'
-              onerror="tryNextFallback(this)"
-              loading="lazy"
-            >
-          </div>
-          <div class="card-body">
-            <div class="card-title">${decoration.name}</div>
-            <div class="card-id">ID: ${decoration.id}</div>
-            ${pricingHTML}
-            <div class="card-actions">
-              <button class="btn" onclick="event.stopPropagation(); openInDiscordDirect('${decoration.url}')">
-                <i class="fas fa-external-link-alt"></i> Xem
-              </button>
-              <button class="btn" onclick="event.stopPropagation(); copyId('${decoration.id}')">
-                <i class="fas fa-copy"></i> Copy ID
-              </button>
-            </div>
-          </div>
+    return `
+    <div class="deco-card" onclick="showDetail('${decoration.id}')" data-type="${decoration.type || 'decoration'}">
+      <div class="deco-card-image">
+        <span class="deco-type-badge">${typeLabel}</span>
+        <img
+          src="${primaryUrl}"
+          alt="${decoration.name}"
+          data-fallbacks='${JSON.stringify(fallbackUrls.slice(1))}'
+          onerror="tryNextFallback(this)"
+          loading="lazy"
+        >
+      </div>
+      <div class="deco-card-body">
+        <div class="deco-card-title">${decoration.name}</div>
+        <div class="deco-card-id">ID: ${decoration.id}</div>
+        ${pricingHTML}
+        <div class="deco-card-actions">
+          <button class="deco-btn" onclick="event.stopPropagation(); openInDiscordDirect('${decoration.url}')">
+            <i class="fas fa-external-link-alt"></i> Xem
+          </button>
+          <button class="deco-btn" onclick="event.stopPropagation(); copyId('${decoration.id}')">
+            <i class="fas fa-copy"></i> Copy ID
+          </button>
         </div>
-      `;
-      }).join('');
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ─── Pagination ───────────────────────────────
+function renderPagination() {
+  const container = document.getElementById('deco-pagination');
+  if (!container) return;
+
+  const totalPages = Math.ceil(currentData.length / ITEMS_PER_PAGE);
+  if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+  let html = '';
+
+  // Prev
+  html += `<button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>
+    <i class="fas fa-chevron-left"></i>
+  </button>`;
+
+  // Page numbers with ellipsis
+  const pages = getPageNumbers(currentPage, totalPages);
+  pages.forEach(p => {
+    if (p === '...') {
+      html += `<span class="page-dots">…</span>`;
+    } else {
+      html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goToPage(${p})">${p}</button>`;
     }
+  });
 
-    function setupEventListeners() {
-      const searchInput = document.getElementById('search-input');
-      searchInput.addEventListener('input', () => {
-        applyFilters();
-      });
+  // Next
+  html += `<button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>
+    <i class="fas fa-chevron-right"></i>
+  </button>`;
 
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.remove('active');
-            b.setAttribute('aria-pressed', 'false');
-          });
-          btn.classList.add('active');
-          btn.setAttribute('aria-pressed', 'true');
-          applyFilters();
-        });
-      });
+  // Page info
+  const start = (currentPage - 1) * ITEMS_PER_PAGE + 1;
+  const end   = Math.min(currentPage * ITEMS_PER_PAGE, currentData.length);
+  html += `<span class="page-dots" style="margin-left:0.5rem;">${start}–${end} / ${currentData.length}</span>`;
 
-      document.querySelectorAll('.view-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-          document.querySelectorAll('.view-btn').forEach(b => {
-            b.classList.remove('active');
-            b.setAttribute('aria-pressed', 'false');
-          });
-          btn.classList.add('active');
-          btn.setAttribute('aria-pressed', 'true');
-          
-          const view = btn.dataset.view;
-          const grid = document.getElementById('decorations-grid');
-          
-          if (view === 'list') {
-            grid.classList.add('list-view');
-          } else {
-            grid.classList.remove('list-view');
-          }
-        });
-      });
+  container.innerHTML = html;
+}
 
-      document.getElementById('detail-modal').addEventListener('click', (e) => {
-        if (e.target.id === 'detail-modal') {
-          closeModal();
-        }
-      });
+function getPageNumbers(current, total) {
+  if (total <= 7) return Array.from({length: total}, (_, i) => i + 1);
+  const pages = [];
+  if (current <= 4) {
+    pages.push(1,2,3,4,5,'...',total);
+  } else if (current >= total - 3) {
+    pages.push(1,'...',total-4,total-3,total-2,total-1,total);
+  } else {
+    pages.push(1,'...',current-1,current,current+1,'...',total);
+  }
+  return pages;
+}
+
+function goToPage(page) {
+  const totalPages = Math.ceil(currentData.length / ITEMS_PER_PAGE);
+  if (page < 1 || page > totalPages) return;
+  currentPage = page;
+  renderPage();
+  renderPagination();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── Show/hide purchase page ──────────────────
+function showPurchasePage() {
+  // Hide grid & pagination
+  const grid = document.getElementById('decorations-grid');
+  const pagination = document.getElementById('deco-pagination');
+  const purchasePage = document.getElementById('deco-purchase-page');
+  if (grid) grid.style.display = 'none';
+  if (pagination) pagination.style.display = 'none';
+  if (purchasePage) purchasePage.style.display = 'block';
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar .category-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('sidebar-purchase')?.classList.add('active');
+
+  // Close sidebar on mobile
+  if (window.innerWidth <= 1024) {
+    document.getElementById('deco-sidebar')?.classList.remove('active');
+  }
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function showDecoGrid() {
+  const grid = document.getElementById('decorations-grid');
+  const pagination = document.getElementById('deco-pagination');
+  const purchasePage = document.getElementById('deco-purchase-page');
+  if (grid) grid.style.display = 'grid';
+  if (pagination) pagination.style.display = 'flex';
+  if (purchasePage) purchasePage.style.display = 'none';
+}
+
+// ─── Public filter setter ──────────────────────
+function setDecoFilter(filter) {
+  currentFilter = filter;
+  showDecoGrid();
+
+  // Update sidebar active state
+  document.querySelectorAll('.sidebar .category-item').forEach(i => i.classList.remove('active'));
+  const sidebarMap = {
+    all: 'sidebar-all',
+    avatar_decoration: 'sidebar-avatar',
+    nameplate: 'sidebar-nameplate',
+    profile_effect: 'sidebar-effect',
+  };
+  const targetId = sidebarMap[filter];
+  if (targetId) document.getElementById(targetId)?.classList.add('active');
+
+  applyFilters();
+
+  // Close sidebar on mobile
+  if (window.innerWidth <= 1024) {
+    document.getElementById('deco-sidebar')?.classList.remove('active');
+  }
+}
+
+// ─── Sidebar / Search toggles ─────────────────
+function toggleDecoSidebar() {
+  document.getElementById('deco-sidebar')?.classList.toggle('active');
+}
+
+function toggleDecoSearch() {
+  const searchBox    = document.getElementById('searchBox');
+  const searchToggle = document.getElementById('searchToggle');
+  if (!searchBox) return;
+  searchBox.classList.toggle('active');
+  searchToggle?.classList.toggle('active');
+  if (searchBox.classList.contains('active')) {
+    setTimeout(() => searchBox.querySelector('input')?.focus(), 150);
+  }
+}
+
+// Close sidebar clicking outside
+document.addEventListener('click', (e) => {
+  const sidebar  = document.getElementById('deco-sidebar');
+  const menuBtn  = document.querySelector('.mobile-menu-btn');
+  if (!sidebar || !menuBtn) return;
+  if (window.innerWidth <= 1024 &&
+      sidebar.classList.contains('active') &&
+      !sidebar.contains(e.target) &&
+      !menuBtn.contains(e.target)) {
+    sidebar.classList.remove('active');
+  }
+});
+
+// ─── Event listeners ─────────────────────────
+function setupEventListeners() {
+  const searchInput = document.getElementById('search-input');
+  if (searchInput) {
+    searchInput.addEventListener('input', applyFilters);
+  }
+
+  document.getElementById('detail-modal')?.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay')) closeModal();
+  });
+}
+
+// ─── Detail Modal ─────────────────────────────
+function showDetail(id) {
+  selectedDecoration = DECORATIONS_DATA.find(d => d.id === id);
+  if (!selectedDecoration) return;
+
+  const fallbackUrls = getImageWithFallbacks(selectedDecoration);
+  const modalImg = document.getElementById('modal-image');
+  modalImg.src = fallbackUrls[0];
+  modalImg.alt = selectedDecoration.name;
+  modalImg.setAttribute('data-fallbacks', JSON.stringify(fallbackUrls.slice(1)));
+  modalImg.onerror = function() { tryNextFallback(this); };
+
+  document.getElementById('modal-title').textContent = selectedDecoration.name;
+  document.getElementById('modal-id').textContent = selectedDecoration.id;
+  document.getElementById('modal-type').textContent = selectedDecoration.typeLabel || selectedDecoration.type;
+
+  // Pricing
+  const pricingEl = document.getElementById('modal-pricing');
+  if (pricingEl && selectedDecoration.pricing?.regular) {
+    const p = selectedDecoration.pricing;
+    if (p.nitro && p.nitro < p.regular) {
+      const disc = Math.round((1 - p.nitro / p.regular) * 100);
+      pricingEl.innerHTML = `
+        <span class="modal-price-label">Giá:</span>
+        <span style="text-decoration:line-through; color:var(--text-secondary); margin-right:6px;">${p.regular.toLocaleString()} ${p.currency}</span>
+        <span class="modal-price" style="color:var(--primary);">${p.nitro.toLocaleString()} ${p.currency}</span>
+        <span class="price-badge">-${disc}%</span>`;
+    } else {
+      pricingEl.innerHTML = `
+        <span class="modal-price-label">Giá:</span>
+        <span class="modal-price">${p.regular.toLocaleString()} ${p.currency}</span>`;
     }
+  } else if (pricingEl) {
+    pricingEl.innerHTML = '';
+  }
 
-    function applyFilters() {
-      const searchQuery = document.getElementById('search-input').value.toLowerCase();
-      const activeFilter = document.querySelector('.filter-btn.active').dataset.filter;
-      
-      let filtered = DECORATIONS_DATA;
-      
-      if (activeFilter !== 'all') {
-        filtered = filtered.filter(d => d.type === activeFilter);
-      }
-      
-      if (searchQuery) {
-        filtered = filtered.filter(d => 
-          d.name.toLowerCase().includes(searchQuery) ||
-          d.id.includes(searchQuery)
-        );
-      }
-      
-      renderDecorations(filtered);
-      document.getElementById('total-count').textContent = filtered.length;
+  document.getElementById('detail-modal').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('detail-modal')?.classList.remove('active');
+  document.body.style.overflow = 'auto';
+}
+
+function openInDiscord() {
+  if (selectedDecoration) window.open(selectedDecoration.url, '_blank', 'noopener,noreferrer');
+}
+
+function openInDiscordDirect(url) {
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+function copyModalId() {
+  if (selectedDecoration) copyId(selectedDecoration.id);
+}
+
+function copyId(id) {
+  navigator.clipboard.writeText(id).then(() => {
+    showToast('✅ Đã copy ID!');
+  });
+}
+
+function showToast(msg) {
+  const toast   = document.getElementById('toast');
+  const toastMsg = document.getElementById('toast-message');
+  if (!toast) return;
+  if (toastMsg) toastMsg.textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2000);
+}
+
+function tryNextFallback(img) {
+  try {
+    const fallbacks = JSON.parse(img.getAttribute('data-fallbacks') || '[]');
+    if (fallbacks.length > 0) {
+      const nextUrl = fallbacks.shift();
+      img.setAttribute('data-fallbacks', JSON.stringify(fallbacks));
+      img.src = nextUrl;
+    } else {
+      img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%23111%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2228%22%3E🎨%3C/text%3E%3C/svg%3E';
+      img.alt = 'Decoration not available';
     }
+  } catch(e) {
+    img.alt = 'Decoration not available';
+  }
+}
 
-    function showDetail(id) {
-      selectedDecoration = DECORATIONS_DATA.find(d => d.id === id);
-      if (!selectedDecoration) return;
-
-      const fallbackUrls = getImageWithFallbacks(selectedDecoration);
-      const modalImg = document.getElementById('modal-image');
-      modalImg.src = fallbackUrls[0];
-      modalImg.alt = `${selectedDecoration.name} decoration preview`;
-      modalImg.setAttribute('data-fallbacks', JSON.stringify(fallbackUrls.slice(1)));
-      modalImg.onerror = function() { tryNextFallback(this); };
-      
-      document.getElementById('modal-title').textContent = selectedDecoration.name;
-      document.getElementById('modal-id').textContent = `ID: ${selectedDecoration.id}`;
-      document.getElementById('detail-modal').classList.add('active');
-    }
-
-    function closeModal() {
-      document.getElementById('detail-modal').classList.remove('active');
-    }
-
-    function openInDiscord() {
-      if (selectedDecoration) {
-        window.open(selectedDecoration.url, '_blank', 'noopener,noreferrer');
-      }
-    }
-
-    function openInDiscordDirect(url) {
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-
-    function copyId(id) {
-      navigator.clipboard.writeText(id).then(() => {
-        const notification = document.createElement('div');
-        notification.textContent = '✅ Đã copy ID!';
-        notification.setAttribute('role', 'status');
-        notification.setAttribute('aria-live', 'polite');
-        notification.style.cssText = `
-          position: fixed;
-          top: 80px;
-          right: 20px;
-          background: #5a7a8a;
-          color: #f4f6f8;
-          padding: 12px 20px;
-          border-radius: 10px;
-          z-index: 9999;
-          font-family: Outfit, sans-serif;
-          font-size: 0.9rem;
-          box-shadow: 0 8px 24px rgba(28,31,35,0.2);
-        `;
-        document.body.appendChild(notification);
-        setTimeout(() => {
-          notification.remove();
-        }, 2000);
-      });
-    }
-
-    function tryNextFallback(img) {
-      try {
-        const fallbacks = JSON.parse(img.getAttribute('data-fallbacks') || '[]');
-        if (fallbacks.length > 0) {
-          const nextUrl = fallbacks.shift();
-          img.setAttribute('data-fallbacks', JSON.stringify(fallbacks));
-          img.src = nextUrl;
-        } else {
-          img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%231a1a1a%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2220%22%3E🎨%3C/text%3E%3C/svg%3E';
-          img.alt = 'Decoration image not available';
-        }
-      } catch (e) {
-        img.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%22200%22 height=%22200%22%3E%3Crect fill=%22%231a1a1a%22 width=%22200%22 height=%22200%22/%3E%3Ctext x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2220%22%3E🎨%3C/text%3E%3C/svg%3E';
-        img.alt = 'Decoration image not available';
-      }
-    }
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });

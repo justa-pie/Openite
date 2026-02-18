@@ -2194,3 +2194,226 @@ body {
     background: var(--primary);
     border-radius: 50%;
 }
+
+/* ═══════════════════════════════════════════════════
+   DECO PAGE — Merged from deco.css
+═══════════════════════════════════════════════════ */
+
+/* Header center title (deco page) */
+.header-center-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.header-count-badge {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  background: var(--card-bg);
+  padding: 0.3rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+/* Deco Grid */
+.deco-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+
+/* Deco Card */
+.deco-card {
+  background: var(--card-bg);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s;
+  border: 1px solid var(--border);
+}
+.deco-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
+  border-color: var(--primary);
+}
+
+.deco-card-image {
+  width: 100%;
+  height: 170px;
+  background: linear-gradient(135deg, var(--card-bg), var(--sidebar-bg));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+.deco-card-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.3s;
+}
+.deco-card:hover .deco-card-image img { transform: scale(1.08); }
+
+.deco-type-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(4px);
+  color: #eee;
+  padding: 3px 9px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 500;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.deco-card-body { padding: 0.9rem 1rem; }
+
+.deco-card-title {
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.deco-card-id {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  font-family: monospace;
+  margin-bottom: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.deco-card-pricing {
+  margin: 6px 0;
+  padding: 5px 9px;
+  background: var(--sidebar-bg);
+  border-radius: 8px;
+  font-size: 0.8rem;
+}
+.price-regular { color: var(--text-secondary); text-decoration: line-through; margin-right: 5px; }
+.price-nitro { color: var(--primary); font-weight: 700; }
+.price-single { color: var(--primary); font-weight: 700; }
+.price-badge {
+  display: inline-block;
+  background: var(--primary);
+  color: #fff;
+  padding: 1px 6px;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  margin-left: 4px;
+  font-weight: 600;
+}
+
+.deco-card-actions { display: flex; gap: 6px; margin-top: 8px; }
+.deco-btn {
+  flex: 1;
+  padding: 0.4rem 0;
+  background: var(--sidebar-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.deco-btn:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+/* Loading / Empty */
+.deco-loading {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 4rem;
+  color: var(--text-secondary);
+  font-size: 1rem;
+}
+.deco-empty {
+  grid-column: 1/-1;
+  text-align: center;
+  padding: 4rem 2rem;
+  color: var(--text-secondary);
+}
+.deco-empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+
+/* Pagination */
+.deco-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 2.5rem;
+}
+.page-btn {
+  min-width: 38px;
+  height: 38px;
+  padding: 0 0.7rem;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.page-btn:hover { border-color: var(--primary); color: var(--primary); }
+.page-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.page-dots {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  padding: 0 4px;
+}
+
+/* Deco Modal overrides */
+.deco-modal-container {
+  max-width: 560px;
+}
+.deco-modal-inner {
+  flex-direction: column;
+}
+.deco-modal-inner .modal-image-section {
+  width: 100%;
+}
+.deco-modal-inner .modal-image-section img {
+  width: 100%;
+  height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: var(--sidebar-bg);
+}
+.deco-modal-inner .modal-info-section {
+  padding: 0;
+  margin-top: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header-center-title { display: none; }
+  .deco-controls { padding: 0.8rem 1rem; }
+  .deco-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 0.8rem; }
+}
