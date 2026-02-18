@@ -1,210 +1,194 @@
 const fs = require('fs');
 
 console.log('╔════════════════════════════════════════╗');
-console.log('║  Parser with Pricing - All Types      ║');
+console.log('║  Parser v4 - Standalone First + Bundle ║');
 console.log('╚════════════════════════════════════════╝\n');
 
-// ── Trích giá từ object prices ────────────────────────────────────────
-function extractPricing(pricesObject) {
-  if (!pricesObject) return null;
-  const result = { regular: null, nitro: null, currency: 'VND' };
-
+// ── Extract pricing ───────────────────────────────────────────────────
+function extractPricing(pricesObj) {
+  if (!pricesObj) return null;
+  const r = { regular: null, nitro: null, currency: 'VND' };
   for (const [key, label] of [['0', 'regular'], ['4', 'nitro']]) {
-    const entry = pricesObject[key];
-    if (!entry) continue;
-    const cp = entry.country_prices;
-    if (!cp || !cp.prices || !cp.prices[0]) continue;
-    const p = cp.prices[0];
+    const prices = pricesObj[key]?.country_prices?.prices;
+    if (!prices?.[0]) continue;
+    const p = prices[0];
     const exp = p.exponent || 0;
-    result[label] = exp ? p.amount / Math.pow(10, exp) : p.amount;
-    result.currency = (p.currency || 'VND').toUpperCase();
+    r[label]   = exp ? p.amount / Math.pow(10, exp) : p.amount;
+    r.currency = (p.currency || 'VND').toUpperCase();
   }
-
-  return (result.regular || result.nitro) ? result : null;
+  return (r.regular || r.nitro) ? r : null;
 }
 
-// ── Đọc file API ──────────────────────────────────────────────────────
+// ── Read API file ─────────────────────────────────────────────────────
 let filename;
 if      (fs.existsSync('api-responses-complete.json')) filename = 'api-responses-complete.json';
 else if (fs.existsSync('api-responses.json'))          filename = 'api-responses.json';
-else {
-  console.error('❌ Không tìm thấy API data file!');
-  console.error('   Chạy: node scrape-browser.js\n');
-  process.exit(1);
-}
+else { console.error('❌ Không tìm thấy API data file!'); process.exit(1); }
 
 console.log(`📖 Đang đọc ${filename}...`);
 const apiData = JSON.parse(fs.readFileSync(filename, 'utf8'));
 console.log(`✅ Đọc thành công (${apiData.length} responses)\n`);
 
 const decorations = [];
-const seenIds     = new Set();
+const seenIds = new Set();
 
-// ── Helper: thêm decoration vào list ─────────────────────────────────
-function addDecoration(id, name, image, type, typeLabel, isAnimated, asset, rawType, pricing, extras = {}) {
+function addItem(id, name, image, type, typeLabel, isAnimated, asset, rawType, pricing, extras = {}) {
   id = String(id);
-  if (!id || seenIds.has(id)) return;
+  if (!id || seenIds.has(id)) return false;
   seenIds.add(id);
   decorations.push({
-    id, name: (name || '').trim(),
-    image,
+    id, name: (name || '').trim(), image,
     url: `https://discord.com/shop#itemSkuId=${id}`,
-    type, typeLabel, isAnimated, asset: asset || null, rawType,
-    pricing,
-    ...extras
+    type, typeLabel, isAnimated,
+    asset: asset || null, rawType, pricing, ...extras
   });
+  return true;
 }
 
-// ── Helper: xử lý 1 sub-item (type 0 / 2 / 1) với pricing cha ───────
-function processSubItem(sub, parentPricing) {
-  const t = sub.type;
-
-  // TYPE 0 - Avatar Decoration
+// ── Process one sub-item with given name and pricing ──────────────────
+function processSubItem(it, pricing, name) {
+  const t = it.type;
   if (t === 0) {
-    if (!sub.assets) return;
-    const img  = sub.assets.animated_image_url || sub.assets.static_image_url;
-    const anim = !!sub.assets.animated_image_url;
-    addDecoration(
-      sub.sku_id || sub.id,
-      sub.label,
-      img,
+    if (!it.assets) return;
+    addItem(it.sku_id || it.id, name,
+      it.assets.animated_image_url || it.assets.static_image_url,
       'avatar_decoration', '👤 Avatar Decoration',
-      anim, sub.asset, 0, parentPricing
-    );
-  }
-
-  // TYPE 2 - Nameplate hoặc Profile Effect
-  else if (t === 2) {
-    if (!sub.assets) return;
-    const img     = sub.assets.animated_image_url || sub.assets.static_image_url;
-    const anim    = !!sub.assets.animated_image_url;
-    const asset   = sub.asset || '';
-    const isPlate = asset.includes('nameplates/');
-    addDecoration(
-      sub.sku_id || sub.id,
-      sub.label,
-      img,
-      isPlate ? 'nameplate' : 'profile_effect',
-      isPlate ? '📛 Nameplate'  : '✨ Profile Effect',
-      anim, asset, 2, parentPricing
-    );
-  }
-
-  // TYPE 1 - Profile Effect
-  else if (t === 1) {
-    const img = sub.thumbnailPreviewSrc || sub.reducedMotionSrc || '';
-    addDecoration(
-      sub.sku_id,
-      sub.title || sub.name,
-      img,
+      !!it.assets.animated_image_url, it.asset, 0, pricing);
+  } else if (t === 2) {
+    if (!it.assets) return;
+    addItem(it.sku_id || it.id, name,
+      it.assets.animated_image_url || it.assets.static_image_url,
+      'nameplate', '📛 Nameplate',
+      !!it.assets.animated_image_url, it.asset || '', 2, pricing);
+  } else if (t === 1) {
+    addItem(it.sku_id, it.title || it.label || name,
+      it.thumbnailPreviewSrc || it.reducedMotionSrc || '',
       'profile_effect', '✨ Profile Effect',
-      !!(sub.effects && sub.effects.length),
-      null, 1, parentPricing,
-      { effects: sub.effects || [], description: sub.description || '' }
-    );
+      !!(it.effects?.length), null, 1, pricing,
+      { effects: it.effects || [], description: it.description || '' });
   }
 }
 
-// ── Xử lý từng product trong category ────────────────────────────────
-function processProduct(prod) {
-  const t = prod.type;
+// ── Collect all products from all responses ───────────────────────────
+const allProducts = [];
+for (const response of apiData) {
+  const d = response.data;
+  if (d?.categories)
+    for (const cat of d.categories)
+      for (const prod of (cat.products || []))
+        allProducts.push(prod);
+  if (d?.shop_blocks)
+    for (const block of d.shop_blocks)
+      for (const sub of (block.subblocks || []))
+        for (const prod of (sub.products || sub.items || []))
+          allProducts.push(prod);
+}
 
-  // BUNDLE (type 1000) → pricing từ bundle, sub-items là items[]
-  if (t === 1000) {
-    const pricing = extractPricing(prod.prices);
-    for (const sub of (prod.items || [])) {
-      processSubItem(sub, pricing);
+console.log(`🔍 Tổng products: ${allProducts.length}\n`);
+
+// ═══════════════════════════════════════════════════════════════════
+//  PASS 1: STANDALONE products (type != 1000) — correct name + price
+// ═══════════════════════════════════════════════════════════════════
+console.log('Pass 1: Standalone products...');
+for (const prod of allProducts) {
+  if (prod.type === 1000) continue;  // skip bundles
+
+  const prodName    = prod.name || '';
+  const prodPricing = extractPricing(prod.prices);
+
+  // Products with variants (e.g. type 2000 - color variants)
+  if (prod.variants?.length) {
+    for (const variant of prod.variants) {
+      const vName    = variant.name || prodName;
+      const vPricing = extractPricing(variant.prices) || prodPricing;
+      for (const it of (variant.items || []))
+        processSubItem(it, vPricing, vName);
     }
-    return;
+    continue;
   }
 
-  // STANDALONE type 0, 1, 2 → pricing nằm ở chính prod.prices
+  // Regular standalone: items inside the product
+  for (const it of (prod.items || []))
+    processSubItem(it, prodPricing, prodName);
+}
+
+const afterPass1 = decorations.length;
+console.log(`   ✅ ${afterPass1} items added\n`);
+
+// ═══════════════════════════════════════════════════════════════════
+//  PASS 2: BUNDLES (type 1000) — add bundle itself, skip sub-items
+//          (sub-items already exist from Pass 1 with correct prices)
+// ═══════════════════════════════════════════════════════════════════
+console.log('Pass 2: Bundles...');
+for (const prod of allProducts) {
+  if (prod.type !== 1000) continue;
+
+  const items   = prod.items || [];
   const pricing = extractPricing(prod.prices);
 
-  // Có variants → mỗi variant có pricing riêng
-  if (prod.variants && prod.variants.length > 0) {
-    for (const variant of prod.variants) {
-      const vPricing = extractPricing(variant.prices) || pricing;
-      for (const sub of (variant.items || [])) {
-        processSubItem(sub, vPricing);
-      }
-    }
-    return;
-  }
+  // Choose best preview image for the bundle card
+  const plateItem  = items.find(it => it.type === 2);
+  const avatarItem = items.find(it => it.type === 0);
+  const fxItem     = items.find(it => it.type === 1);
 
-  // Không có variants → xử lý items[] với pricing chung
-  for (const sub of (prod.items || [])) {
-    processSubItem(sub, pricing);
-  }
+  let bundleImage =
+    plateItem?.assets?.animated_image_url  ||
+    avatarItem?.assets?.animated_image_url ||
+    fxItem?.thumbnailPreviewSrc            || '';
+
+  const includedTypes = items.map(it =>
+    it.type === 0 ? 'Avatar' : it.type === 2 ? 'Nameplate' : 'Profile FX'
+  );
+
+  addItem(prod.sku_id, prod.name || '', bundleImage,
+    'bundle', '📦 Bundle', true, null, 1000, pricing, {
+      bundleItems: items.map(it => ({
+        sku_id: String(it.sku_id || it.id),
+        type: it.type === 0 ? 'avatar_decoration' : it.type === 2 ? 'nameplate' : 'profile_effect',
+      })),
+      includedTypes,
+    }
+  );
 }
 
-// ── Scan toàn bộ API responses ────────────────────────────────────────
-console.log('🔍 Đang extract...\n');
+const bundlesAdded = decorations.length - afterPass1;
+console.log(`   ✅ ${bundlesAdded} bundles added\n`);
 
-for (const response of apiData) {
-  const data = response.data;
-
-  // collectibles-categories: { categories: [ { products: [...] } ] }
-  if (data && data.categories) {
-    for (const cat of data.categories) {
-      for (const prod of (cat.products || [])) {
-        processProduct(prod);
-      }
-    }
-  }
-
-  // collectibles-shop: { shop_blocks: [ { subblocks: [...] } ] }
-  if (data && data.shop_blocks) {
-    for (const block of data.shop_blocks) {
-      for (const sub of (block.subblocks || [])) {
-        for (const prod of (sub.products || sub.items || [])) {
-          processProduct(prod);
-        }
-      }
-    }
-  }
-}
-
-// ── Thống kê ──────────────────────────────────────────────────────────
+// ── Stats ─────────────────────────────────────────────────────────────
 const stats = {
-  total:            decorations.length,
+  total:             decorations.length,
+  bundles:           decorations.filter(d => d.type === 'bundle').length,
   avatarDecorations: decorations.filter(d => d.type === 'avatar_decoration').length,
-  nameplates:       decorations.filter(d => d.type === 'nameplate').length,
-  profileEffects:   decorations.filter(d => d.type === 'profile_effect').length,
-  animated:         decorations.filter(d => d.isAnimated).length,
-  withPricing:      decorations.filter(d => d.pricing).length,
+  nameplates:        decorations.filter(d => d.type === 'nameplate').length,
+  profileEffects:    decorations.filter(d => d.type === 'profile_effect').length,
+  withPricing:       decorations.filter(d => d.pricing).length,
 };
 
-console.log(`✨ Tìm thấy: ${stats.total} items\n`);
-console.log('📊 PHÂN LOẠI:\n');
+console.log('📊 KẾT QUẢ:');
+console.log(`   📦 Bundles            : ${stats.bundles}`);
 console.log(`   👤 Avatar Decorations : ${stats.avatarDecorations}`);
 console.log(`   📛 Nameplates         : ${stats.nameplates}`);
 console.log(`   ✨ Profile Effects    : ${stats.profileEffects}`);
-console.log(`   🎬 Animated           : ${stats.animated}`);
 console.log(`   💰 With Pricing       : ${stats.withPricing}`);
-console.log(`   📦 Total              : ${stats.total}\n`);
+console.log(`   📦 TOTAL              : ${stats.total}\n`);
 
-if (stats.withPricing < stats.total) {
-  const missing = decorations.filter(d => !d.pricing);
-  console.log(`⚠️  ${missing.length} items THIẾU pricing:`);
-  missing.slice(0, 5).forEach(d => console.log(`   - [${d.type}] ${d.name} (${d.id})`));
-  console.log();
-}
+// Spot-check
+console.log('🔎 SPOT CHECK:');
+['avatar_decoration','nameplate','profile_effect','bundle'].forEach(type => {
+  const sample = decorations.filter(d => d.type === type).slice(0,2);
+  sample.forEach(d => {
+    const p = d.pricing;
+    console.log(`   [${type}] "${d.name}" — ${p ? p.regular?.toLocaleString()+' '+p.currency : 'no price'}`);
+  });
+});
+console.log();
 
-// ── Lưu file ─────────────────────────────────────────────────────────
-console.log('💾 Đang lưu files...');
-
+// ── Save ──────────────────────────────────────────────────────────────
+console.log('💾 Đang lưu...');
 fs.writeFileSync('decorations-simple.json', JSON.stringify(decorations, null, 2));
 console.log('✅ decorations-simple.json');
-
 fs.writeFileSync('decorations.json', JSON.stringify({
-  scrapedAt: new Date().toISOString(),
-  source: filename,
-  stats,
-  decorations,
+  scrapedAt: new Date().toISOString(), source: filename, stats, decorations
 }, null, 2));
 console.log('✅ decorations.json\n');
-
-console.log('🎯 Bước tiếp theo:');
-console.log('   node inject-data.js');
-console.log('   open index.html\n');
+console.log('🎯 Tiếp theo: node inject-data.js\n');
