@@ -95,6 +95,12 @@ function filterProducts(category) {
         }
     });
 
+    // Also show/hide deco banner card
+    document.querySelectorAll('.deco-banner-card').forEach(card => {
+        const cat = card.getAttribute('data-category');
+        card.style.display = (category === 'all' || cat === category) ? 'block' : 'none';
+    });
+
     document.querySelectorAll('.product-divider').forEach(divider => {
         const cat = divider.getAttribute('data-category');
         if (category === 'all' || cat === category) {
@@ -122,6 +128,7 @@ function initSearch() {
 
         const visibleCategories = new Set();
 
+        // Search product cards
         document.querySelectorAll('.product-card').forEach(product => {
             const nameEl = product.querySelector('.product-name');
             const descEl = product.querySelector('.product-description');
@@ -139,6 +146,16 @@ function initSearch() {
             } else {
                 product.style.display = 'none';
             }
+        });
+
+        // Search banner cards (deco banner etc.)
+        document.querySelectorAll('.deco-banner-card').forEach(card => {
+            const cat      = card.getAttribute('data-category') || '';
+            const keywords = card.getAttribute('data-name') || '';
+            const match    = term === '' || keywords.includes(term) || cat.includes(term);
+
+            card.style.display = match ? 'block' : 'none';
+            if (match) visibleCategories.add(cat);
         });
 
         document.querySelectorAll('.product-divider').forEach(divider => {
@@ -216,6 +233,11 @@ document.addEventListener('DOMContentLoaded', () => {
     showPage('home');
 
     document.querySelectorAll('.product-card').forEach(p => { p.style.display = 'flex'; });
+    document.querySelectorAll('.deco-banner-card').forEach(c => {
+        c.style.display = 'flex';
+        c.style.opacity = '1';
+        c.style.transform = 'none';
+    });
 
     // ── Music & Volume ──────────────────────────────────────────────
     const bgMusic      = document.getElementById('bgMusic');
