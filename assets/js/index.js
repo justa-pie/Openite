@@ -348,5 +348,3 @@ function closeProductModal() {
         document.body.style.overflow = 'auto';
     }
 }
-
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeProductModal(); });

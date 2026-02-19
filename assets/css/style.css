@@ -2238,8 +2238,6 @@ body {
   border: 1px solid var(--border);
 }
 .deco-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.2);
   border-color: var(--primary);
 }
 
@@ -2252,6 +2250,7 @@ body {
   justify-content: center;
   position: relative;
   overflow: hidden;
+  border-bottom: 1px solid var(--border);
 }
 .deco-card-image img {
   max-width: 100%;
@@ -2259,7 +2258,7 @@ body {
   object-fit: contain;
   transition: transform 0.3s;
 }
-.deco-card:hover .deco-card-image img { transform: scale(1.08); }
+
 
 .deco-type-badge {
   position: absolute;
@@ -2313,6 +2312,7 @@ body {
   background: var(--sidebar-bg);
   border-radius: 8px;
   font-size: 0.8rem;
+  border: 1px solid var(--border);
 }
 .price-regular { color: var(--text-secondary); text-decoration: line-through; margin-right: 5px; }
 .price-nitro { color: var(--primary); font-weight: 700; }
@@ -2328,7 +2328,7 @@ body {
   font-weight: 600;
 }
 
-.deco-card-actions { display: flex; gap: 6px; margin-top: 8px; }
+.deco-card-actions { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
 .deco-btn {
   flex: 1;
   padding: 0.4rem 0;
@@ -2437,87 +2437,4 @@ body {
   .header-center-title { display: none; }
   .deco-controls { padding: 0.8rem 1rem; }
   .deco-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 0.8rem; }
-}
-/* ─── Decoration Banner Card (index.html) ─── */
-.deco-banner-card {
-  position: relative;
-  border-radius: 16px;
-  overflow: hidden;
-  cursor: pointer;
-  min-height: 120px;
-  margin-bottom: 1rem;
-  transition: all 0.3s ease;
-  border: 1px solid var(--dark-cream);
-  background: var(--white);
-}
-.deco-banner-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 30px var(--shadow);
-  border-color: var(--primary);
-}
-.deco-banner-bg {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-.deco-banner-bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0.08;
-  display: block;
-}
-.deco-banner-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(88,101,242,0.05) 0%, rgba(255,255,255,0.4) 100%);
-}
-.deco-banner-content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 1.2rem;
-  padding: 1.4rem 1.8rem;
-  width: 100%;
-}
-.deco-banner-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  background: var(--accent-light);
-  border: 1px solid var(--dark-cream);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  color: var(--primary);
-  flex-shrink: 0;
-}
-.deco-banner-text {
-  flex: 1;
-}
-.deco-banner-text h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--dark);
-  margin: 0 0 4px;
-}
-.deco-banner-text p {
-  font-size: 0.78rem;
-  color: var(--text-light);
-  margin: 0;
-}
-.deco-banner-arrow {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  color: var(--primary);
-  font-size: 0.85rem;
-  font-weight: 600;
-  flex-shrink: 0;
-  transition: gap 0.2s ease;
-}
-.deco-banner-card:hover .deco-banner-arrow {
-  gap: 12px;
 }
