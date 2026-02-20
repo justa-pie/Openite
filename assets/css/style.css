@@ -21,6 +21,13 @@
     --mist: rgba(232, 234, 237, 0.85);
     --deep: #2c3540;             /* Xanh đen sâu */
     --silver: #9aaab4;           /* Bạc */
+
+    /* Deco page variables */
+    --card-bg: #ffffff;
+    --sidebar-bg: #f0f2f4;
+    --border: rgba(90, 122, 138, 0.2);
+    --text-primary: #1c1f23;
+    --text-secondary: #5a7a8a;
 }
 
 body {
