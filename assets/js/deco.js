@@ -141,7 +141,7 @@ deco.type === 'avatar_decoration' ? '<i class="fas fa-user-circle"></i> Avatar' 
 
     return `
     <div class="deco-card"
-         onclick="showDetail('${deco.id}')" data-type="${deco.type}">
+          onclick="showDetail('${deco.id}')" data-type="${deco.type}">
       <div class="deco-card-image">
         <span class="deco-type-badge">${badge}</span>
         ${imageAreaHTML}
