@@ -19,8 +19,12 @@ let selectedDecoration = null;
 function getProxiedImageUrl(url) {
   if (!url) return '';
   if (url.includes('cdn.discordapp.com')) {
-    if (url.includes('.gif')) return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400`;
-    return `https://wsrv.nl/?url=${encodeURIComponent(url)}&w=400&output=webp`;
+    // Thêm passthrough=true để Discord trả về GIF động thay vì ảnh tĩnh
+    if (url.includes('?')) {
+      return url + '&passthrough=true';
+    } else {
+      return url + '?passthrough=true';
+    }
   }
   return url;
 }
