@@ -2253,23 +2253,7 @@ body {
   border-color: var(--primary);
 }
 
-.deco-card-image {
-  width: 100%;
-  height: 170px;
-  background: linear-gradient(135deg, var(--card-bg), var(--sidebar-bg));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  overflow: hidden;
-  border-bottom: 1px solid var(--border);
-}
-.deco-card-image img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-  transition: transform 0.3s;
-}
+/* .deco-card-image — defined in deco modal section below */
 
 
 .deco-type-badge {
@@ -2497,101 +2481,237 @@ body {
 }
 
 /* Deco Modal overrides */
+/* ══════════════════════════════════════════════════
+   DECO MODAL — per-type layouts
+══════════════════════════════════════════════════ */
+
+/* Container chung */
 .deco-modal-container {
-  max-width: 680px;
+  max-width: 500px;
+  width: 92vw;
   border-radius: 20px;
-}
-.deco-modal-inner {
-  flex-direction: row;
-  min-height: 0;
+  overflow: hidden;
+  position: relative;
 }
 
-/* Ảnh bên trái — vuông, nền tối */
+/* Inner wrapper */
+.deco-modal-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Modal image section chung ── */
 .deco-modal-inner .modal-image-section {
-  width: 260px;
-  min-width: 260px;
-  background: #12141a;
+  background: #0e1016;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 20px 0 0 20px;
   overflow: hidden;
-  padding: 24px;
+  position: relative;
 }
 .deco-modal-inner .modal-image-section img {
-  width: 100%;
-  max-width: 200px;
-  height: auto;
-  aspect-ratio: 1;
+  display: block;
   object-fit: contain;
-  border-radius: 12px;
 }
 
-/* Info bên phải */
+/* ── Info section chung ── */
 .deco-modal-inner .modal-info-section {
-  flex: 1;
-  padding: 28px 28px 24px;
-  overflow-y: auto;
+  padding: 18px 22px 22px;
   display: flex;
   flex-direction: column;
   gap: 0;
-  margin-top: 0;
 }
 
-/* Tên deco */
-.deco-modal-inner .modal-product-name {
-  font-size: 1.25rem;
+/* ── Type badge ── */
+.modal-type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  align-self: flex-start;
+}
+.modal-badge--avatar    { background: #e7f0f4; color: #5a7a8a; }
+.modal-badge--nameplate { background: #fef3c7; color: #b45309; }
+.modal-badge--fx        { background: #ede9fe; color: #5b45c9; }
+.modal-badge--bundle    { background: #e7f4e7; color: #2d7a2d; }
+
+/* ── Product name ── */
+.modal-product-name {
+  font-size: 1.15rem;
   font-weight: 800;
   color: var(--text-primary);
+  margin: 0 0 10px;
   line-height: 1.3;
-  margin-bottom: 6px;
+  padding-right: 36px;
 }
 
-/* Divider gọn */
-.deco-modal-inner .modal-divider {
+/* ── Divider ── */
+.modal-divider {
+  height: 1px;
+  background: #eef0f2;
   margin: 10px 0;
 }
 
-/* Buttons */
-.deco-modal-inner [style*="display:flex"][style*="gap:0.6rem"] {
-  margin-top: 16px !important;
+/* ── Pricing ── */
+.modal-price-section {
+  margin-bottom: 4px;
+}
+.modal-price-section .shop-pricing { margin: 0; }
+.modal-price-section .shop-pricing-dc { font-size: 0.73rem; }
+.modal-price-section .shop-pricing-row { padding: 7px 13px; font-size: 0.78rem; border-radius: 8px; }
+.modal-price-section .shop-pricing-row span:last-child { font-size: 0.88rem; }
+
+/* ── Action buttons ── */
+.modal-action-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+.modal-buy-btn {
+  flex: 1;
+  padding: 11px 0;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.modal-buy-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+.modal-buy-btn--secondary {
+  flex: 0.45;
+  background: #f0f4f6;
+  color: var(--text-secondary);
+}
+
+/* ── Replay button (FX only) ── */
+.modal-replay-btn {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  color: rgba(255,255,255,.55);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 0.68rem;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+.modal-replay-btn:hover { background: rgba(255,255,255,.14); }
+
+/* ══ AVATAR — ảnh vuông trên, info dưới ══ */
+.deco-modal--avatar {
+  flex-direction: column;
+}
+.deco-modal--avatar .modal-image-section {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 5%;
+}
+.deco-modal--avatar .modal-image-section img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ══ NAMEPLATE — ảnh wide trên, info dưới ══ */
+.deco-modal--nameplate {
+  flex-direction: column;
+}
+.deco-modal-container:has(.deco-modal--nameplate) {
+  max-width: 560px;
+}
+.deco-modal--nameplate .modal-image-section {
+  width: 100%;
+  aspect-ratio: 16 / 5;
+  padding: 5% 8%;
+  background-image: radial-gradient(circle, rgba(255,255,255,.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+.deco-modal--nameplate .modal-image-section img {
+  width: 100%;
+  height: 100%;
+}
+
+/* ══ PROFILE FX — ảnh bên trái full height, info phải ══ */
+.deco-modal--fx {
+  flex-direction: row;
+  min-height: 400px;
+}
+.deco-modal-container:has(.deco-modal--fx) {
+  max-width: 660px;
+}
+.deco-modal--fx .modal-image-section {
+  width: 44%;
+  min-width: 44%;
+  flex-direction: column;
+  padding: 16px 14px 12px;
+  gap: 0;
+  justify-content: center;
+}
+.deco-modal--fx .modal-image-section img {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+.deco-modal--fx .modal-info-section {
+  flex: 1;
+  padding: 24px 22px 22px;
+  justify-content: center;
 }
 
 /* ── Responsive modal ── */
-@media (max-width: 640px) {
-  .deco-modal-container {
-    max-width: 98vw;
-    width: 98vw;
-    border-radius: 16px;
-    margin: 8px;
-  }
-  .deco-modal-inner {
+@media (max-width: 600px) {
+  .deco-modal--fx {
     flex-direction: column;
+    min-height: unset;
   }
-  .deco-modal-inner .modal-image-section {
+  .deco-modal--fx .modal-image-section {
     width: 100%;
     min-width: unset;
-    border-radius: 16px 16px 0 0;
-    padding: 20px;
-    height: 180px;
+    aspect-ratio: 1 / 1;
+    padding: 12%;
   }
-  .deco-modal-inner .modal-image-section img {
-    max-width: 140px;
-    height: 140px;
+  .deco-modal-container:has(.deco-modal--fx),
+  .deco-modal-container:has(.deco-modal--nameplate) {
+    max-width: 98vw;
   }
-  .deco-modal-inner .modal-info-section {
-    padding: 18px 18px 16px;
-  }
-  .deco-modal-inner .modal-product-name {
-    font-size: 1.05rem;
-  }
-  .modal-price-section .shop-pricing-row {
-    padding: 6px 10px;
-    font-size: 0.78rem;
-  }
-  .modal-price-section .shop-pricing-row span:last-child {
-    font-size: 0.88rem;
-  }
+  .modal-product-name { font-size: 1rem; }
+}
+
+/* ══════════════════════════════════════════════════
+   DECO GRID CARDS — 3 loại cùng kích thước
+══════════════════════════════════════════════════ */
+.deco-card-image {
+  background: #0e1016;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 12px;
+  overflow: hidden;
+}
+.deco-card-image img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  transition: transform 0.3s;
+}
+.deco-card:hover .deco-card-image img {
+  transform: scale(1.04);
 }
 
 /* Responsive */
@@ -2605,7 +2725,7 @@ body {
   .deco-card-body { padding: 0.7rem 0.8rem; }
   .shop-pricing-row { padding: 4px 7px; font-size: 0.66rem; }
   .shop-pricing-row span:last-child { font-size: 0.72rem; }
-  .shop-pricing-dc { font-size: 0.6rem; }
+  .deco-card-image { height: 130px; }
 }
 
 /* ==================== DECO BANNER CARD (index.html) ==================== */

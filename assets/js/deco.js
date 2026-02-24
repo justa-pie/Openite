@@ -31751,56 +31751,122 @@ function setupEventListeners() {
   });
 }
 
-// ─── Detail Modal ────────────────���────────────���
+// ─── Detail Modal ──────────────────────────────
 function showDetail(id) {
   selectedDecoration = DECORATIONS_DATA.find(d => d.id === id);
   if (!selectedDecoration) return;
 
-  const deco = selectedDecoration;
-  // Modal view: dùng animated image (GIF động)
-  const urls = getImageWithFallbacks(deco, true);
-  const p    = deco.pricing || {};
-  const cur  = p.currency === 'DISCORD_ORB' ? ' Orbs' : ' VNĐ';
+  const deco    = selectedDecoration;
+  const urls    = getImageWithFallbacks(deco, true);
+  const imgSrc  = urls[0];
+  const fallStr = JSON.stringify(urls.slice(1)).replace(/"/g, '&quot;');
+  const p       = deco.pricing || {};
 
-  const modalImg = document.getElementById('modal-image');
-  modalImg.src   = urls[0];
-  modalImg.alt   = deco.name;
-  modalImg.setAttribute('data-fallbacks', JSON.stringify(urls.slice(1)));
-  modalImg.onerror = function() { tryNextFallback(this); };
+  const pricingHTML = p.currency !== 'DISCORD_ORB'
+    ? renderShopPricingHTML(p)
+    : `<div class="shop-pricing"><div class="shop-pricing-dc">${p.regular} Orbs</div></div>`;
 
-  document.getElementById('modal-title').textContent = deco.name;
+  const actionBtns = `
+    <div class="modal-action-btns">
+      <button class="modal-buy-btn" onclick="openInDiscord()">
+        <i class="fas fa-shopping-bag"></i> Mua Ngay
+      </button>
+      <button class="modal-buy-btn modal-buy-btn--secondary" onclick="copyModalLink()">
+        <i class="fas fa-link"></i> Copy Link
+      </button>
+    </div>`;
 
-  const typeMap = {
-    bundle:            '<i class="fas fa-box-open"></i> Bundle',
-    avatar_decoration: '<i class="fas fa-user-circle"></i> Avatar Decoration',
-    nameplate:         '<i class="fas fa-id-badge"></i> Nameplate',
-    profile_effect:    '<i class="fas fa-magic"></i> Profile Effect',
-  };
-  document.getElementById('modal-type').innerHTML = typeMap[deco.type] || deco.type;
-
-  // Bundle: show included items
-  const modalIdEl = document.getElementById('modal-id');
+  // Bundle included types
+  let bundleHTML = '';
   if (deco.type === 'bundle' && deco.includedTypes?.length) {
-    const tagMap = { Avatar: 'fa-user-circle', Nameplate: 'fa-id-badge', 'Profile FX': 'fa-magic' };
-    modalIdEl.innerHTML = `<div class="bundle-includes" style="margin-top:6px;">
+    const tagMap = { Avatar:'fa-user-circle', Nameplate:'fa-id-badge', 'Profile FX':'fa-magic' };
+    bundleHTML = `<div class="bundle-includes">
       Bao gồm: ${deco.includedTypes.map(t =>
-        `<span class="bundle-tag"><i class="fas ${tagMap[t] || 'fa-star'}"></i> ${t}</span>`
+        `<span class="bundle-tag"><i class="fas ${tagMap[t]||'fa-star'}"></i> ${t}</span>`
       ).join(' ')}
     </div>`;
-  } else {
-    modalIdEl.textContent = '';
   }
 
-  // Pricing
-  const pricingEl = document.getElementById('modal-pricing');
-  if (pricingEl) {
-    pricingEl.innerHTML = p.currency !== 'DISCORD_ORB'
-      ? renderShopPricingHTML(p)
-      : `<div class="shop-pricing"><div class="shop-pricing-dc">${p.regular} Orbs</div></div>`;
+  // Type badge
+  const typeBadgeMap = {
+    avatar_decoration: { icon:'fa-user-circle', label:'Avatar Decoration', cls:'modal-badge--avatar' },
+    nameplate:         { icon:'fa-id-badge',    label:'Nameplate',          cls:'modal-badge--nameplate' },
+    profile_effect:    { icon:'fa-magic',        label:'Profile Effect',     cls:'modal-badge--fx' },
+    bundle:            { icon:'fa-box-open',     label:'Bundle',             cls:'modal-badge--bundle' },
+  };
+  const tb = typeBadgeMap[deco.type] || { icon:'fa-star', label:deco.type, cls:'' };
+  const typeBadge = `<span class="modal-type-badge ${tb.cls}">
+    <i class="fas ${tb.icon}"></i> ${tb.label}
+  </span>`;
+
+  // Info block (shared)
+  const infoHTML = `
+    <div class="modal-info-section">
+      ${typeBadge}
+      <h2 class="modal-product-name">${deco.name}</h2>
+      <div class="modal-divider"></div>
+      ${bundleHTML}
+      <div class="modal-price-section">${pricingHTML}</div>
+      ${actionBtns}
+    </div>`;
+
+  // ── Build inner HTML based on type ──
+  let innerHTML = '';
+
+  if (deco.type === 'nameplate') {
+    // Layout: ảnh wide strip trên → info bên dưới
+    innerHTML = `
+      <div class="deco-modal-inner deco-modal--nameplate">
+        <div class="modal-image-section">
+          <img src="${imgSrc}" alt="${deco.name}"
+            data-fallbacks="${fallStr}" onerror="tryNextFallback(this)">
+        </div>
+        ${infoHTML}
+      </div>`;
+
+  } else if (deco.type === 'profile_effect') {
+    // Layout: ảnh bên trái full height → info bên phải
+    innerHTML = `
+      <div class="deco-modal-inner deco-modal--fx">
+        <div class="modal-image-section">
+          <img id="modal-image" src="${imgSrc}" alt="${deco.name}"
+            data-fallbacks="${fallStr}" onerror="tryNextFallback(this)">
+          <button class="modal-replay-btn" onclick="replayModalGif()">
+            <i class="fas fa-redo"></i> Xem lại
+          </button>
+        </div>
+        ${infoHTML}
+      </div>`;
+
+  } else {
+    // avatar_decoration + bundle: ảnh vuông trên → info bên dưới
+    innerHTML = `
+      <div class="deco-modal-inner deco-modal--avatar">
+        <div class="modal-image-section">
+          <img id="modal-image" src="${imgSrc}" alt="${deco.name}"
+            data-fallbacks="${fallStr}" onerror="tryNextFallback(this)">
+        </div>
+        ${infoHTML}
+      </div>`;
   }
+
+  const container = document.querySelector('#detail-modal .modal-container');
+  container.innerHTML = `
+    <button class="modal-close" onclick="closeModal()">
+      <i class="fas fa-times"></i>
+    </button>
+    ${innerHTML}`;
 
   document.getElementById('detail-modal').classList.add('active');
   document.body.style.overflow = 'hidden';
+}
+
+function replayModalGif() {
+  const img = document.getElementById('modal-image');
+  if (!img) return;
+  const src = img.src;
+  img.src = '';
+  img.src = src;
 }
 
 function closeModal() {
