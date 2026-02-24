@@ -79,8 +79,10 @@ function processSubItem(it, pricing, name) {
       'nameplate', '📛 Nameplate',
       !!it.assets.animated_image_url, it.asset || '', 2, pricing);
   } else if (t === 1) {
+    // Lấy GIF động từ effects[0].src thay vì thumbnail tĩnh
+    const animatedSrc = it.effects?.[0]?.src || it.thumbnailPreviewSrc || it.reducedMotionSrc || '';
     addItem(it.sku_id, it.title || it.label || name,
-      it.thumbnailPreviewSrc || it.reducedMotionSrc || '',
+      animatedSrc,  // ← Dùng GIF từ effects[0].src, không phải thumbnail
       'profile_effect', '✨ Profile Effect',
       !!(it.effects?.length), null, 1, pricing,
       { effects: it.effects || [], description: it.description || '' });
