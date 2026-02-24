@@ -68,24 +68,38 @@ function processSubItem(it, pricing, name) {
   const t = it.type;
   if (t === 0) {
     if (!it.assets) return;
+    // Avatar: lưu cả static và animated
     addItem(it.sku_id || it.id, name,
-      it.assets.animated_image_url || it.assets.static_image_url,
+      it.assets.static_image_url || it.assets.animated_image_url,
       'avatar_decoration', '👤 Avatar Decoration',
-      !!it.assets.animated_image_url, it.asset, 0, pricing);
+      !!it.assets.animated_image_url, it.asset, 0, pricing, {
+        staticImage: it.assets.static_image_url || '',
+        animatedImage: it.assets.animated_image_url || ''
+      });
   } else if (t === 2) {
     if (!it.assets) return;
+    // Nameplate: lưu cả static và animated
     addItem(it.sku_id || it.id, name,
-      it.assets.animated_image_url || it.assets.static_image_url,
+      it.assets.static_image_url || it.assets.animated_image_url,
       'nameplate', '📛 Nameplate',
-      !!it.assets.animated_image_url, it.asset || '', 2, pricing);
+      !!it.assets.animated_image_url, it.asset || '', 2, pricing, {
+        staticImage: it.assets.static_image_url || '',
+        animatedImage: it.assets.animated_image_url || ''
+      });
   } else if (t === 1) {
-    // Lấy GIF động từ effects[0].src thay vì thumbnail tĩnh
-    const animatedSrc = it.effects?.[0]?.src || it.thumbnailPreviewSrc || it.reducedMotionSrc || '';
+    // Profile effect: lưu cả static (thumbnail) và animated (effects[0].src)
+    const staticImage = it.thumbnailPreviewSrc || it.reducedMotionSrc || '';
+    const animatedSrc = it.effects?.[0]?.src || staticImage;
     addItem(it.sku_id, it.title || it.label || name,
-      animatedSrc,  // ← Dùng GIF từ effects[0].src, không phải thumbnail
+      staticImage,
       'profile_effect', '✨ Profile Effect',
       !!(it.effects?.length), null, 1, pricing,
-      { effects: it.effects || [], description: it.description || '' });
+      { 
+        effects: it.effects || [], 
+        description: it.description || '',
+        staticImage: staticImage,
+        animatedImage: animatedSrc
+      });
   }
 }
 
