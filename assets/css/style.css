@@ -2318,26 +2318,40 @@ body {
   text-overflow: ellipsis;
 }
 
-.deco-card-pricing {
-  margin: 6px 0;
-  padding: 5px 9px;
-  background: var(--sidebar-bg);
-  border-radius: 8px;
-  font-size: 0.8rem;
-  border: 1px solid var(--border);
+/* ── Shop Pricing Block ──────────────────────────────── */
+.shop-pricing {
+  margin: 7px 0 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
-.price-regular { color: var(--text-secondary); text-decoration: line-through; margin-right: 5px; }
-.price-nitro { color: var(--primary); font-weight: 700; }
-.price-single { color: var(--primary); font-weight: 700; }
-.price-badge {
-  display: inline-block;
-  background: var(--primary);
-  color: #fff;
-  padding: 1px 6px;
-  border-radius: 4px;
+.shop-pricing-dc {
+  font-size: 0.6rem;
+  color: #b0bac4;
+  margin-bottom: 2px;
+}
+.shop-pricing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: 6px;
+  padding: 4px 8px;
   font-size: 0.68rem;
-  margin-left: 4px;
-  font-weight: 600;
+}
+.shop-pricing-row span:last-child {
+  font-weight: 800;
+}
+.shop-pricing-login {
+  background: #eef2f5;
+  color: var(--primary);
+}
+.shop-pricing-nitro {
+  background: #ede9fe;
+  color: #7c6af7;
+}
+.shop-pricing-gift {
+  background: #fef3c7;
+  color: #d97706;
 }
 
 .deco-card-actions { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }

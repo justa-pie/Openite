@@ -31388,6 +31388,84 @@ const DECORATIONS_DATA = [
 //  DECO PAGE LOGIC — v5 (bundle support)
 // ═══════════════════════════════════════════════
 
+// ┌─────────────────────────────────────────────────────────────────────┐
+// │  BẢNG GIÁ SHOP — Chỉnh tại đây, tất cả deco tự cập nhật           │
+// │                                                                     │
+// │  Key = giá Discord regular (VND)                                    │
+// │  login  = giá shop khi login KHÔNG có Nitro                         │
+// │  nitro  = giá shop khi login CÓ Nitro                               │
+// │  gift   = giá shop dạng Gift (không cần Nitro)                     │
+// │                                                                     │
+// │  Dùng null nếu chưa có giá → hiển thị "Liên hệ"                   │
+// │  Ví dụ: { login: null, nitro: null, gift: null }                   │
+// └─────────────────────────────────────────────────────────────────────┘
+const SHOP_PRICE_TABLE = {
+  //  Discord gốc  →  Shop bán
+  //  regular       login     nitro     gift
+    79000:  { login:  36000, nitro:  23000, gift:  46000 },
+    105000:  { login:  64000, nitro:  36000, gift:  null },
+    118000:  { login:  null, nitro:  49000, gift:  null },
+    131000:  { login:  94000, nitro:  64000, gift:  null },
+    136000:  { login:  94000, nitro:  48000, gift:  null },
+    141000:  { login:  99000, nitro:  50000, gift:  null },
+    146000:  { login:  109000, nitro:  94000, gift:  null },
+    170000:  { login:  null, nitro:  null, gift:  null },
+    189000:  { login:  139000, nitro:  99000, gift: null },
+  // Ví dụ chưa có giá:
+  //  999000: { login: null, nitro: null, gift: null },
+  // Hoặc chỉ 1 loại chưa có:
+  //  999000: { login: 450000, nitro: null, gift: null },
+};
+
+// Tính giá shop từ giá Discord
+// — Trả về object { login, nitro, gift } (mỗi field có thể là số hoặc null)
+// — Nếu không có trong bảng → fallback tất cả null (hiện "Liên hệ")
+function getShopPricing(discordRegular) {
+  if (!discordRegular) return null;
+  if (SHOP_PRICE_TABLE[discordRegular]) return SHOP_PRICE_TABLE[discordRegular];
+  // Không có trong bảng → chưa định giá, hiện "Liên hệ"
+  return { login: null, nitro: null, gift: null };
+}
+
+// Format giá: số → "36.000đ", null → "Liên hệ"
+function fmtVND(n) {
+  if (n === null || n === undefined) return 'Liên hệ';
+  return n.toLocaleString('vi-VN') + 'đ';
+}
+
+// Render HTML bảng giá cho card và modal
+function renderShopPricingHTML(discordPricing) {
+  if (!discordPricing || !discordPricing.regular) return '';
+  const sp = getShopPricing(discordPricing.regular);
+  if (!sp) return '';
+  const dRegular = discordPricing.regular;
+  const dNitro   = discordPricing.nitro || discordPricing.regular;
+
+  // Nếu cả 3 đều null → hiện 1 dòng "Liên hệ" gọn hơn
+  const allNull = sp.login === null && sp.nitro === null && sp.gift === null;
+  if (allNull) return `
+  <div class="shop-pricing">
+    <div class="shop-pricing-dc">Discord: ${fmtVND(dRegular)} &nbsp;·&nbsp; Nitro: ${fmtVND(dNitro)}</div>
+    <div class="shop-pricing-row shop-pricing-contact">
+      <span>Giá shop</span><span>Liên hệ</span>
+    </div>
+  </div>`;
+
+  return `
+  <div class="shop-pricing">
+    <div class="shop-pricing-dc">Discord: ${fmtVND(dRegular)} &nbsp;·&nbsp; Nitro: ${fmtVND(dNitro)}</div>
+    <div class="shop-pricing-row shop-pricing-login ${sp.login === null ? 'shop-pricing-tbd' : ''}">
+      <span>Login (không Nitro)</span><span>${fmtVND(sp.login)}</span>
+    </div>
+    <div class="shop-pricing-row shop-pricing-nitro ${sp.nitro === null ? 'shop-pricing-tbd' : ''}">
+      <span>Login (có Nitro)</span><span>${fmtVND(sp.nitro)}</span>
+    </div>
+    <div class="shop-pricing-row shop-pricing-gift ${sp.gift === null ? 'shop-pricing-tbd' : ''}">
+      <span>Gift</span><span>${fmtVND(sp.gift)}</span>
+    </div>
+  </div>`;
+}
+
 const ITEMS_PER_PAGE = 50;
 let currentData   = [];
 let currentPage   = 1;
@@ -31521,21 +31599,10 @@ deco.type === 'avatar_decoration' ? '<i class="fas fa-user-circle"></i> Avatar' 
                                           '<i class="fas fa-magic"></i> Profile FX';
 
     // Pricing
-    let pricingHTML = '';
-    if (p.regular) {
-      if (p.nitro && p.nitro > 0 && p.nitro < p.regular) {
-        const disc = Math.round((1 - p.nitro / p.regular) * 100);
-        pricingHTML = `<div class="deco-card-pricing">
-          <span class="price-regular">${p.regular.toLocaleString()}${cur}</span>
-          <span class="price-nitro">${p.nitro.toLocaleString()}${cur}</span>
-          <span class="price-badge">-${disc}%</span>
-        </div>`;
-      } else {
-        pricingHTML = `<div class="deco-card-pricing">
-          <span class="price-single">${p.regular.toLocaleString()}${cur}</span>
-        </div>`;
-      }
-    }
+    const pricingHTML = p.currency !== 'DISCORD_ORB' ? renderShopPricingHTML(p) : `
+      <div class="shop-pricing">
+        <div class="shop-pricing-dc">${p.regular} Orbs</div>
+      </div>`;
 
     const bundleTagsHTML = '';
 
@@ -31726,23 +31793,11 @@ function showDetail(id) {
 
   // Pricing
   const pricingEl = document.getElementById('modal-pricing');
-  if (pricingEl && p.regular) {
-    if (p.nitro && p.nitro > 0 && p.nitro < p.regular) {
-      const disc = Math.round((1 - p.nitro / p.regular) * 100);
-      pricingEl.innerHTML = `
-        <span class="modal-price-label">Giá:</span>
-        <span style="text-decoration:line-through;color:var(--text-secondary);margin-right:6px;">
-          ${p.regular.toLocaleString()}${cur}</span>
-        <span class="modal-price">${p.nitro.toLocaleString()}${cur}</span>
-        <span class="price-badge">-${disc}%</span>
-        <div style="font-size:.75rem;color:var(--text-secondary);margin-top:4px;">
-          <i class="fas fa-gem"></i> Giá Nitro</div>`;
-    } else {
-      pricingEl.innerHTML = `
-        <span class="modal-price-label">Giá:</span>
-        <span class="modal-price">${p.regular.toLocaleString()}${cur}</span>`;
-    }
-  } else if (pricingEl) { pricingEl.innerHTML = ''; }
+  if (pricingEl) {
+    pricingEl.innerHTML = p.currency !== 'DISCORD_ORB'
+      ? renderShopPricingHTML(p)
+      : `<div class="shop-pricing"><div class="shop-pricing-dc">${p.regular} Orbs</div></div>`;
+  }
 
   document.getElementById('detail-modal').classList.add('active');
   document.body.style.overflow = 'hidden';
