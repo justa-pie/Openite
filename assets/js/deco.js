@@ -31821,7 +31821,7 @@ function copySkuLink(url, btn) {
     showToast('Đã copy link!');
     if (btn) {
       const orig = btn.innerHTML;
-      btn.innerHTML     = '<i class="fas fa-check"></i> Copied!';
+      btn.innerHTML     = '<i class="fas fa-check"></i> Đã copy!';
       btn.style.background  = 'var(--primary)';
       btn.style.color       = '#fff';
       btn.style.borderColor = 'var(--primary)';

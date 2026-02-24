@@ -2318,40 +2318,100 @@ body {
   text-overflow: ellipsis;
 }
 
+/* ── Modal type label & action buttons ─────────────── */
+.modal-type-label {
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+.modal-action-btns {
+  display: flex;
+  gap: 8px;
+  margin-top: 16px;
+}
+.modal-buy-btn--secondary {
+  background: var(--card-bg) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border) !important;
+  flex: 0.6;
+}
+.modal-buy-btn--secondary:hover {
+  background: var(--sidebar-bg) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: none !important;
+}
+
 /* ── Shop Pricing Block ──────────────────────────────── */
 .shop-pricing {
-  margin: 7px 0 4px;
+  margin: 8px 0 4px;
   display: flex;
   flex-direction: column;
   gap: 3px;
 }
 .shop-pricing-dc {
-  font-size: 0.6rem;
-  color: #b0bac4;
-  margin-bottom: 2px;
+  font-size: 0.67rem;
+  color: #8a96a3;
+  font-weight: 500;
+  margin-bottom: 3px;
+  letter-spacing: 0.01em;
 }
 .shop-pricing-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 0.68rem;
+  padding: 5px 9px;
+  font-size: 0.72rem;
+}
+.shop-pricing-row span:first-child {
+  font-weight: 500;
+  opacity: 0.9;
 }
 .shop-pricing-row span:last-child {
   font-weight: 800;
+  font-size: 0.78rem;
+  letter-spacing: -0.01em;
 }
 .shop-pricing-login {
-  background: #eef2f5;
-  color: var(--primary);
+  background: #e4ecf1;
+  color: #3d6878;
 }
 .shop-pricing-nitro {
-  background: #ede9fe;
-  color: #7c6af7;
+  background: #e8e4fb;
+  color: #5b45c9;
 }
 .shop-pricing-gift {
-  background: #fef3c7;
-  color: #d97706;
+  background: #fdedc5;
+  color: #b45309;
+}
+.shop-pricing-contact {
+  background: #f0f2f4;
+  color: #7a8a96;
+  font-style: italic;
+}
+/* Khi 1 dòng cụ thể là "Liên hệ" */
+.shop-pricing-tbd span:last-child {
+  font-style: italic;
+  opacity: 0.65;
+}
+
+/* ── Modal pricing dùng font lớn hơn ────────────────── */
+.modal-price-section .shop-pricing {
+  margin: 0;
+  gap: 6px;
+}
+.modal-price-section .shop-pricing-dc {
+  font-size: 0.78rem;
+  margin-bottom: 4px;
+}
+.modal-price-section .shop-pricing-row {
+  padding: 8px 14px;
+  border-radius: 9px;
+  font-size: 0.85rem;
+}
+.modal-price-section .shop-pricing-row span:last-child {
+  font-size: 1rem;
 }
 
 .deco-card-actions { display: flex; gap: 6px; margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border); }
@@ -2438,31 +2498,114 @@ body {
 
 /* Deco Modal overrides */
 .deco-modal-container {
-  max-width: 560px;
+  max-width: 680px;
+  border-radius: 20px;
 }
 .deco-modal-inner {
-  flex-direction: column;
+  flex-direction: row;
+  min-height: 0;
 }
+
+/* Ảnh bên trái — vuông, nền tối */
 .deco-modal-inner .modal-image-section {
-  width: 100%;
+  width: 260px;
+  min-width: 260px;
+  background: #12141a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px 0 0 20px;
+  overflow: hidden;
+  padding: 24px;
 }
 .deco-modal-inner .modal-image-section img {
   width: 100%;
-  height: 200px;
+  max-width: 200px;
+  height: auto;
+  aspect-ratio: 1;
   object-fit: contain;
   border-radius: 12px;
-  background: var(--sidebar-bg);
 }
+
+/* Info bên phải */
 .deco-modal-inner .modal-info-section {
-  padding: 0;
-  margin-top: 1rem;
+  flex: 1;
+  padding: 28px 28px 24px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 0;
+}
+
+/* Tên deco */
+.deco-modal-inner .modal-product-name {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.3;
+  margin-bottom: 6px;
+}
+
+/* Divider gọn */
+.deco-modal-inner .modal-divider {
+  margin: 10px 0;
+}
+
+/* Buttons */
+.deco-modal-inner [style*="display:flex"][style*="gap:0.6rem"] {
+  margin-top: 16px !important;
+}
+
+/* ── Responsive modal ── */
+@media (max-width: 640px) {
+  .deco-modal-container {
+    max-width: 98vw;
+    width: 98vw;
+    border-radius: 16px;
+    margin: 8px;
+  }
+  .deco-modal-inner {
+    flex-direction: column;
+  }
+  .deco-modal-inner .modal-image-section {
+    width: 100%;
+    min-width: unset;
+    border-radius: 16px 16px 0 0;
+    padding: 20px;
+    height: 180px;
+  }
+  .deco-modal-inner .modal-image-section img {
+    max-width: 140px;
+    height: 140px;
+  }
+  .deco-modal-inner .modal-info-section {
+    padding: 18px 18px 16px;
+  }
+  .deco-modal-inner .modal-product-name {
+    font-size: 1.05rem;
+  }
+  .modal-price-section .shop-pricing-row {
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+  .modal-price-section .shop-pricing-row span:last-child {
+    font-size: 0.88rem;
+  }
 }
 
 /* Responsive */
 @media (max-width: 768px) {
   .header-center-title { display: none; }
   .deco-controls { padding: 0.8rem 1rem; }
-  .deco-grid { grid-template-columns: repeat(auto-fill, minmax(145px, 1fr)); gap: 0.8rem; }
+  .deco-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 0.8rem; }
+}
+@media (max-width: 480px) {
+  .deco-grid { grid-template-columns: repeat(2, 1fr); gap: 0.6rem; }
+  .deco-card-body { padding: 0.7rem 0.8rem; }
+  .shop-pricing-row { padding: 4px 7px; font-size: 0.66rem; }
+  .shop-pricing-row span:last-child { font-size: 0.72rem; }
+  .shop-pricing-dc { font-size: 0.6rem; }
 }
 
 /* ==================== DECO BANNER CARD (index.html) ==================== */

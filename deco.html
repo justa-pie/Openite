@@ -29,7 +29,7 @@
       </button>
       <div class="search-box" id="searchBox">
         <i class="fas fa-search"></i>
-        <input type="text" id="search-input" placeholder="Tim kiem decoration..." autocomplete="off">
+        <input type="text" id="search-input" placeholder="Tìm kiếm decoration..." autocomplete="off">
       </div>
       <div class="header-count-badge">
         <span id="total-count">0</span> items
@@ -44,24 +44,24 @@
     <aside class="sidebar" id="deco-sidebar">
 
       <div class="category-section">
-        <div class="category-title">Menu Chinh</div>
+        <div class="category-title">Menu Chính</div>
         <a href="index.html" class="category-item">
           <span class="category-icon"><i class="fas fa-arrow-left"></i></span>
-          <span class="category-name">Quay lai Shop</span>
+          <span class="category-name">Quay lại Shop</span>
         </a>
         <a href="#" class="category-item active" id="sidebar-all" onclick="setDecoFilter('all')">
           <span class="category-icon"><i class="fas fa-th"></i></span>
-          <span class="category-name">Tat Ca</span>
+          <span class="category-name">Tất Cả</span>
           <span class="category-count" id="count-all">-</span>
         </a>
         <a href="#" class="category-item" id="sidebar-purchase" onclick="event.preventDefault(); showPurchasePage()">
           <span class="category-icon"><i class="fas fa-shopping-bag"></i></span>
-          <span class="category-name">Mua Hang &amp; Ho Tro</span>
+          <span class="category-name">Mua Hàng &amp; Hỗ Trợ</span>
         </a>
       </div>
 
       <div class="category-section">
-        <div class="category-title">Loai Decoration</div>
+        <div class="category-title">Loại Decoration</div>
         <a href="#" class="category-item" id="sidebar-avatar" onclick="setDecoFilter('avatar_decoration')">
           <span class="category-icon"><i class="fas fa-user-circle"></i></span>
           <span class="category-name">Avatar Decoration</span>
@@ -77,7 +77,6 @@
           <span class="category-name">Profile Effect</span>
           <span class="category-count" id="count-effect">-</span>
         </a>
-
       </div>
 
     </aside>
@@ -87,7 +86,7 @@
 
       <!-- Deco Grid -->
       <div class="deco-grid" id="decorations-grid">
-        <div class="deco-loading"><i class="fas fa-spinner fa-spin"></i> Dang tai decorations...</div>
+        <div class="deco-loading"><i class="fas fa-spinner fa-spin"></i> Đang tải decorations...</div>
       </div>
 
       <!-- Pagination -->
@@ -99,59 +98,59 @@
           <div class="purchase-icon">
             <i class="fab fa-discord"></i>
           </div>
-          <h2 class="purchase-title">Mua Hang Qua Discord Server</h2>
+          <h2 class="purchase-title">Mua Hàng Qua Discord Server</h2>
           <div class="purchase-message">
             <p class="purchase-intro">
-              Vi mot so ly do ve bao mat, chinh sach thanh toan va de dam bao dich vu tot nhat cho khach hang,
-              chung toi hien chua cho phep mua hang truc tiep tren website.
+              Vì một số lý do về bảo mật, chính sách thanh toán và để đảm bảo dịch vụ tốt nhất cho khách hàng,
+              chúng tôi hiện chưa cho phép mua hàng trực tiếp trên website.
             </p>
             <div class="purchase-reasons">
               <div class="reason-item">
                 <i class="fas fa-shield-alt"></i>
                 <div>
-                  <h4>Bao Mat Giao Dich</h4>
-                  <p>Discord cung cap moi truong giao dich an toan voi ma hoa end-to-end</p>
+                  <h4>Bảo Mật Giao Dịch</h4>
+                  <p>Discord cung cấp môi trường giao dịch an toàn với mã hoá end-to-end</p>
                 </div>
               </div>
               <div class="reason-item">
                 <i class="fas fa-comments"></i>
                 <div>
-                  <h4>Ho Tro Truc Tiep</h4>
-                  <p>Chat truc tiep voi team support de duoc tu van va giai dap ngay lap tuc</p>
+                  <h4>Hỗ Trợ Trực Tiếp</h4>
+                  <p>Chat trực tiếp với team support để được tư vấn và giải đáp ngay lập tức</p>
                 </div>
               </div>
               <div class="reason-item">
                 <i class="fas fa-bolt"></i>
                 <div>
-                  <h4>Giao Hang Nhanh Chong</h4>
-                  <p>Xu ly don hang va giao san pham ngay sau khi xac nhan thanh toan</p>
+                  <h4>Giao Hàng Nhanh Chóng</h4>
+                  <p>Xử lý đơn hàng và giao sản phẩm ngay sau khi xác nhận thanh toán</p>
                 </div>
               </div>
               <div class="reason-item">
                 <i class="fas fa-user-check"></i>
                 <div>
-                  <h4>Xac Thuc Khach Hang</h4>
-                  <p>Dam bao moi giao dich deu duoc xac thuc va an toan cho ca hai ben</p>
+                  <h4>Xác Thực Khách Hàng</h4>
+                  <p>Đảm bảo mọi giao dịch đều được xác thực và an toàn cho cả hai bên</p>
                 </div>
               </div>
             </div>
             <p class="purchase-note">
               <i class="fas fa-info-circle"></i>
-              Chung toi dang phat trien he thong thanh toan truc tuyen va se som cap nhat tinh nang mua hang truc tiep tren website.
+              Chúng tôi đang phát triển hệ thống thanh toán trực tuyến và sẽ sớm cập nhật tính năng mua hàng trực tiếp trên website.
             </p>
           </div>
           <a href="https://discord.gg/UAtfXgYWmS" class="discord-btn" target="_blank">
             <i class="fab fa-discord"></i>
-            Tham Gia Discord Server De Mua Hang
+            Tham Gia Discord Server Để Mua Hàng
           </a>
           <div class="purchase-benefits">
-            <h3>Mua hang qua Discord ban se duoc:</h3>
+            <h3>Mua hàng qua Discord bạn sẽ được:</h3>
             <ul>
-              <li><i class="fas fa-check-circle"></i> Tu van san pham phu hop nhat</li>
-              <li><i class="fas fa-check-circle"></i> Ho tro 24/7 qua chat truc tiep</li>
-              <li><i class="fas fa-check-circle"></i> Uu dai dac biet cho thanh vien Discord</li>
-              <li><i class="fas fa-check-circle"></i> Cap nhat san pham moi va khuyen mai som nhat</li>
-              <li><i class="fas fa-check-circle"></i> Cong dong nguoi dung nang dong va than thien</li>
+              <li><i class="fas fa-check-circle"></i> Tư vấn sản phẩm phù hợp nhất</li>
+              <li><i class="fas fa-check-circle"></i> Hỗ trợ 24/7 qua chat trực tiếp</li>
+              <li><i class="fas fa-check-circle"></i> Ưu đãi đặc biệt cho thành viên Discord</li>
+              <li><i class="fas fa-check-circle"></i> Cập nhật sản phẩm mới và khuyến mãi sớm nhất</li>
+              <li><i class="fas fa-check-circle"></i> Cộng đồng người dùng năng động và thân thiện</li>
             </ul>
           </div>
         </div>
@@ -162,11 +161,11 @@
         <div class="footer-content">
           <div class="footer-section">
             <h3>OPENITE</h3>
-            <p>Opening Night Store | Uy tin - Chat luong - Tan tam.</p>
-            <p style="margin-top: 1rem; color: var(--accent);"><i class="fas fa-star"></i> Noi uoc mo so hoa tro thanh hien thuc</p>
+            <p>Opening Night Store | Uy tín - Chất lượng - Tận tâm.</p>
+            <p style="margin-top: 1rem; color: var(--accent);"><i class="fas fa-star"></i> Nơi ước mơ số hoá trở thành hiện thực</p>
           </div>
           <div class="footer-section">
-            <h3>Dich Vu</h3>
+            <h3>Dịch Vụ</h3>
             <ul>
               <li><a href="index.html">Discord Services</a></li>
               <li><a href="index.html">Premium Accounts</a></li>
@@ -176,15 +175,15 @@
             </ul>
           </div>
           <div class="footer-section">
-            <h3>Mua Hang &amp; Ho Tro</h3>
+            <h3>Mua Hàng &amp; Hỗ Trợ</h3>
             <ul>
               <li><a href="https://discord.gg/UAtfXgYWmS" target="_blank">Discord Server</a></li>
             </ul>
           </div>
           <div class="footer-section">
-            <h3>Ve Chung Toi</h3>
+            <h3>Về Chúng Tôi</h3>
             <ul>
-              <li><a href="index.html">Moi thu ban can biet ve Openite</a></li>
+              <li><a href="index.html">Mọi thứ bạn cần biết về Openite</a></li>
             </ul>
           </div>
         </div>
@@ -209,15 +208,15 @@
         <div class="modal-info-section">
           <h2 id="modal-title" class="modal-product-name"></h2>
           <div class="modal-divider"></div>
-          <p id="modal-type" style="color: var(--accent); font-size:0.85rem; margin-bottom:0.5rem;"></p>
+          <p id="modal-type" class="modal-type-label"></p>
           <p id="modal-id"></p>
           <div class="modal-divider"></div>
           <div id="modal-pricing" class="modal-price-section"></div>
-          <div style="display:flex; gap:0.6rem; margin-top:1rem;">
+          <div class="modal-action-btns">
             <button class="modal-buy-btn" onclick="openInDiscord()">
               <i class="fas fa-shopping-bag"></i> Mua Ngay
             </button>
-            <button class="modal-buy-btn" style="background:var(--card-bg); color:var(--text-secondary); border:1px solid var(--border);" onclick="copyModalLink()">
+            <button class="modal-buy-btn modal-buy-btn--secondary" onclick="copyModalLink()">
               <i class="fas fa-link"></i> Copy Link
             </button>
           </div>
@@ -229,7 +228,7 @@
   <!-- Toast -->
   <div class="toast" id="toast">
     <i class="fas fa-check-circle"></i>
-    <span id="toast-message">Thao tac thanh cong!</span>
+    <span id="toast-message">Thao tác thành công!</span>
   </div>
 
   <script src="assets/js/deco.js"></script>
