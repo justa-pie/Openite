@@ -2522,6 +2522,38 @@ body {
   gap: 0;
 }
 
+/* ── FX phase indicator ── */
+.modal-fx-phase {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.6);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,.1);
+  color: rgba(255,255,255,.75);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 0.62rem;
+  font-weight: 600;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: none;
+  font-family: 'Outfit', sans-serif;
+}
+.modal-fx-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.modal-fx-dot--intro { background: #60a5fa; }
+.modal-fx-dot--loop  { background: #a78bfa; animation: fxDotBlink 1.4s infinite; }
+@keyframes fxDotBlink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
 /* ── Type badge ── */
 .modal-type-badge {
   display: inline-flex;

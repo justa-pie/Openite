@@ -31618,15 +31618,20 @@ const DECORATIONS_DATA = [
 const SHOP_PRICE_TABLE = {
   //  Discord gốc  →  Shop bán
   //  regular       login     nitro     gift
-    79000:  { login:  36000, nitro:  23000, gift:  46000 },
-    105000:  { login:  64000, nitro:  36000, gift:  null },
-    118000:  { login:  null, nitro:  49000, gift:  null },
-    131000:  { login:  94000, nitro:  64000, gift:  null },
-    136000:  { login:  94000, nitro:  48000, gift:  null },
-    141000:  { login:  99000, nitro:  50000, gift:  null },
-    146000:  { login:  109000, nitro:  94000, gift:  null },
-    170000:  { login:  null, nitro:  null, gift:  null },
-    189000:  { login:  139000, nitro:  99000, gift: null },
+     79000:  { login:  36000, nitro:  23000, gift:  46000 },
+    105000:  { login:  50000, nitro:  36000, gift:  60000 },
+    118000:  { login:  56000, nitro:  40000, gift:  66000 },
+    131000:  { login:  62000, nitro:  46000, gift:  72000 },
+    136000:  { login:  65000, nitro:  48000, gift:  75000 },
+    141000:  { login:  67000, nitro:  50000, gift:  77000 },
+    146000:  { login:  70000, nitro:  52000, gift:  80000 },
+    170000:  { login:  80000, nitro:  60000, gift:  90000 },
+    189000:  { login:  90000, nitro:  66000, gift: 100000 },
+    205000:  { login:  98000, nitro:  72000, gift: 108000 },
+    220000:  { login: 105000, nitro:  78000, gift: 115000 },
+    269000:  { login: 128000, nitro:  95000, gift: 138000 },
+    319000:  { login: 152000, nitro: 112000, gift: 162000 },
+    399000:  { login: 190000, nitro: 140000, gift: 200000 },
   // Ví dụ chưa có giá:
   //  999000: { login: null, nitro: null, gift: null },
   // Hoặc chỉ 1 loại chưa có:
@@ -32041,18 +32046,27 @@ function showDetail(id) {
       </div>`;
 
   } else if (deco.type === 'profile_effect') {
-    // Layout: ảnh bên trái full height → info bên phải
+    // Lấy intro và loop src từ effects array
+    const effects   = deco.effects || [];
+    const introEff  = effects[0] || {};
+    const loopEff   = effects.find(e => e.loop) || effects[1] || {};
+    const introSrc  = introEff.src || imgSrc;
+    const loopSrc   = loopEff.src  || imgSrc;
+    const introDur  = introEff.duration || 3000;
+
     innerHTML = `
       <div class="deco-modal-inner deco-modal--fx">
         <div class="modal-image-section">
-          <img id="modal-image" src="${imgSrc}" alt="${deco.name}"
-            data-fallbacks="${fallStr}" onerror="tryNextFallback(this)">
-          <button class="modal-replay-btn" onclick="replayModalGif()">
-            <i class="fas fa-redo"></i> Xem lại
-          </button>
+          <img id="modal-fx-img" src="${introSrc}" alt="${deco.name}">
+          <div class="modal-fx-phase" id="modal-fx-phase">
+            <span class="modal-fx-dot modal-fx-dot--intro"></span> Intro
+          </div>
         </div>
         ${infoHTML}
       </div>`;
+
+    // Lưu FX data để startFxPlayer dùng
+    window._fxData = { introSrc, loopSrc, introDur };
 
   } else {
     // avatar_decoration + bundle: ảnh vuông trên → info bên dưới
@@ -32075,17 +32089,39 @@ function showDetail(id) {
 
   document.getElementById('detail-modal').classList.add('active');
   document.body.style.overflow = 'hidden';
+
+  // Nếu là profile_effect → start FX player
+  if (deco.type === 'profile_effect' && window._fxData) {
+    startFxPlayer(window._fxData);
+  }
 }
 
-function replayModalGif() {
-  const img = document.getElementById('modal-image');
+// ─── FX Player — intro chạy xong tự chuyển loop ───
+let _fxTimer = null;
+
+function startFxPlayer({ introSrc, loopSrc, introDur }) {
+  clearTimeout(_fxTimer);
+
+  const img   = document.getElementById('modal-fx-img');
+  const phase = document.getElementById('modal-fx-phase');
   if (!img) return;
-  const src = img.src;
+
   img.src = '';
-  img.src = src;
+  img.src = introSrc;
+  if (phase) phase.innerHTML = '<span class="modal-fx-dot modal-fx-dot--intro"></span> Intro';
+
+  _fxTimer = setTimeout(() => {
+    const img2   = document.getElementById('modal-fx-img');
+    const phase2 = document.getElementById('modal-fx-phase');
+    if (!img2) return;
+    img2.src = '';
+    img2.src = loopSrc;
+    if (phase2) phase2.innerHTML = '<span class="modal-fx-dot modal-fx-dot--loop"></span> Loop';
+  }, introDur);
 }
 
 function closeModal() {
+  clearTimeout(_fxTimer);
   document.getElementById('detail-modal')?.classList.remove('active');
   document.body.style.overflow = 'auto';
 }
